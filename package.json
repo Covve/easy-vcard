@@ -1,0 +1,34 @@
+{
+  "name": "easy-vcard",
+  "version": "0.0.1",
+  "description": "Simple vcard formatter",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "placeholder"
+  },
+  "keywords": [
+    "vcard",
+    "vcf",
+    "v-card"
+  ],
+  "author": "jasonasmk",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^23.3.10",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.5",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "@types/lodash.clonedeep": "^4.5.4",
+    "lodash": "^4.17.11",
+    "lodash.clonedeep": "^4.5.0"
+  }
+}
