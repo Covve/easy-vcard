@@ -109,7 +109,7 @@ describe('Formatter', () => {
       fullNames: ['John'],
     };
     vcard.phones = [{
-      number: '+10 012345',
+      value: '+10 012345',
       params: { value: 'text' }
     }];
 
@@ -129,10 +129,10 @@ describe('Formatter', () => {
     };
     vcard.phones = [
       {
-        number: '+10 012345', params: { value: 'text', pref: '1', type: 'voice,home' }
+        value: '+10 012345', params: { value: 'text', pref: '1', type: 'voice,home' }
       },
       {
-        number: 'tel:+1-555-555-5555;ext=5555', params: { value: 'uri' }
+        value: 'tel:+1-555-555-5555;ext=5555', params: { value: 'uri' }
       },
       {}
     ];
@@ -143,7 +143,194 @@ describe('Formatter', () => {
                                       'TEL;VALUE=text;PREF=1;TYPE="voice,home":+10 012345\r\n' +
                                       'TEL;VALUE=uri:tel:+1-555-555-5555;ext=5555\r\n' +
                                       'END:VCARD');
-  }); 
+  });
+
+  it('formats a VCard an email', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.emails = [{ value: 'jdoe@smithsonian.com', params: { type: 'work', pref: '1' } }];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'EMAIL;PREF=1;TYPE=work:jdoe@smithsonian.com\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with emails in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.emails = [
+      { value: 'jdoe@smithsoni\nan.com', params: { type: 'work', pref: '1' } },
+      { value: 'jdo,e2@smith sonian.com', params: <any> { type: null } },
+      {}
+    ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'EMAIL;PREF=1;TYPE=work:jdoe@smithsoni\\nan.com\r\n' +
+                                      'EMAIL:jdo\,e2@smith sonian.com\r\n' + 
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with a job title', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.titles = [{ value: 'Chief Officer' } ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'TITLE:Chief Officer\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with titles in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.titles = [
+      { value: 'Chief, officer\n', params: { pid: '1' } },
+      { value: 'Father of 3', params: {pid: '2', altId: '3'} },
+      {}
+    ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'TITLE;PID=1:Chief\, officer\\n\r\n' +
+                                      'TITLE;ALTID=3;PID=2:Father of 3\r\n' + 
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with a job role', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.roles = [{ value: 'Project leader' } ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'ROLE:Project leader\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with roles in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.roles = [
+      { value: 'Project, Lead;-er\n', params: { pid: '1' } },
+      { value: '\n\nFounder', params: {pid: '2', altId: '3'} },
+      {}
+    ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'ROLE;PID=1:Project\, Lead\;-er\\n\r\n' +
+                                      'ROLE;ALTID=3;PID=2:\\n\\nFounder\r\n' + 
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with an organization', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.organizations = [{ values: ['Covve Ltd.'] } ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'ORG:Covve Ltd.\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with roles in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.organizations = [
+      { values: ['Covve Ltd.', 'North American Division\nUSA'] },
+      { values: ['Greatworks', 'Lumber Company', 'Inc.\n'], params: { type: 'main' }},
+      {}
+    ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'ORG:Covve Ltd.;North American Division\\nUSA\r\n' +
+                                      'ORG;TYPE=main:Greatworks;Lumber Company;Inc.\\n\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with a note entry', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.notes = [{ value: 'Something noted' } ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'NOTE:Something noted\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with notes in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.notes = [
+      { value: 'Something noted\nwith many\nlines, of text', params: { language: 'En' } },
+      { value: '\nAnother note' },
+      {}
+    ];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'NOTE;LANGUAGE=En:Something noted\\nwith many\\nlines\, of text\r\n' +
+                                      'NOTE:\\nAnother note\r\n' + 
+                                      'END:VCARD');
+  });
+
+
 
   describe('params', () => {
     it('formats all params', () => {

@@ -1,7 +1,7 @@
 // TODO: line folding
 // mandatory FN or empty
 
-import { VCard, IParams } from "../vcard/vcard";
+import { VCard, IParams, ISingleValueProperty } from "../vcard/vcard"; 
 import { isEmpty } from "lodash";
 
 const NEWLINE = '\r\n';
@@ -25,6 +25,11 @@ export class Formatter {
       this.getNameComponents(vCard),
       ...this.getAddresses(vCard),
       ...this.getPhones(vCard),
+      ...this.getEmails(vCard),
+      ...this.getTitles(vCard),
+      ...this.getRoles(vCard),
+      ...this.getOrganizations(vCard),
+      ...this.getNotes(vCard),
       END_TOKEN
     ];
     return lines
@@ -89,16 +94,49 @@ export class Formatter {
   }
 
   /**
-   * Adds the TEL - telephone entry. Creates one for each address in the vCard.phones field.
+   * Adds the TEL - telephone entry. Creates one for each phone in the vCard.phones field.
    */
   private getPhones(vCard: VCard): string[] {
-    let phones = vCard.phones;
-    if(!phones || !phones.length) return [];
-    return phones
-      .filter(phone => !!phone && !isEmpty(phone))
-      .map((phone) => 
-           'TEL' + this.getFormattedParams(phone.params) + ':' + this.e(phone.number)
-      );
+    return this.getSingleValuedProperty(vCard.phones, 'TEL');
+  }
+
+  /**
+   * Adds the EMAIL - email entry. Creates one for each email in the vCard.emails field.
+   */
+  private getEmails(vCard: VCard): string[] {
+    return this.getSingleValuedProperty(vCard.emails, 'EMAIL');
+  }
+
+  /**
+   * Add the TITLE - job title entry. Creates one for each title in the vCard.titles field.
+   */
+  private getTitles(vCard: VCard): string[] {
+    return this.getSingleValuedProperty(vCard.titles, 'TITLE');
+  }
+
+  /**
+   * Add the ROLE - job role entry. Creates one for each role in the vCard.roles field.
+   */
+  private getRoles(vCard: VCard): string[] {
+    return this.getSingleValuedProperty(vCard.roles, 'ROLE');
+  }
+
+  /**
+   * Add the ORG - organization entry. Creates one for each organization in vCard.organizations
+   */
+  private getOrganizations(vCard: VCard): string[] {  
+    const orgs = vCard.organizations;
+    if(!orgs || !orgs.length) return [];
+    return orgs
+      .filter(org => !!org && !!org.values && !!org.values.length)
+      .map((org: any) => 'ORG' + this.getFormattedParams(org.params) + ':' + org.values.map((v: string) => this.e(v)).join(';'));
+  }
+
+  /**
+   * Add the NOTE - note entry. Creates one for each note in vCard.notes
+   */
+  private getNotes(vCard: VCard): string[] {
+    return this.getSingleValuedProperty(vCard.notes, 'NOTE');
   }
 
   /**
@@ -193,5 +231,12 @@ export class Formatter {
     if((result.indexOf(':') !== -1) || (result.indexOf(';') !== -1 ) || (result.indexOf(',') !== -1))
       return "\"" + result + "\"";
     return result;
+  }
+
+  private getSingleValuedProperty(entities: ISingleValueProperty[], propertyIdentifier: string): string[] {
+    if(!entities || !entities.length) return [];
+    return entities
+      .filter(entity => !!entity && entity.value)
+      .map((entity) => propertyIdentifier + this.getFormattedParams(entity.params) + ':' + this.e(entity.value));
   }
 }

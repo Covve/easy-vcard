@@ -36,29 +36,54 @@ export interface IAddress {
   params?: IParams;
 }
 
-export interface IPhone {
-  number?: string;
+export interface ISingleValueProperty {
+  value?: string;
+  params?: IParams;
+}
+
+export interface IMultiValueProperty {
+  values?: string[];
   params?: IParams;
 }
 
 export interface IVCard {
   name?: IName;
   addresses?: IAddress[];
-  phones?: IPhone[];
+  phones?: ISingleValueProperty[];
+  emails?: ISingleValueProperty[];
+  titles?: ISingleValueProperty[];
+  roles?: ISingleValueProperty[];
+  organizations?: IMultiValueProperty[];
+  notes?: ISingleValueProperty[];
 }
 
 export class VCard implements IVCard {
   public name: IName = {};
   public addresses: IAddress[] = [];
-  public phones: IPhone[] = [];
+  public phones: ISingleValueProperty[] = [];
+  public emails: ISingleValueProperty[] = [];
+  public titles: ISingleValueProperty[] = [];
+  public roles: ISingleValueProperty[] = [];
+  public organizations: IMultiValueProperty[] = [];
+  public notes: ISingleValueProperty[] = [];
    
   constructor(data?: IVCard) {
-    if(!data) return;
-    if(data.name)
+    if (!data) return;
+    if (data.name)
       this.name = cloneDeep(data.name);
-    if(data.addresses)
+    if (data.addresses)
       this.addresses = cloneDeep(data.addresses);
-    if(data.phones)
+    if (data.phones)
       this.phones = cloneDeep(data.phones);
+    if (data.emails)
+      this.emails = cloneDeep(data.emails);
+    if (data.titles)
+      this.titles = cloneDeep(data.titles);
+    if (data.roles)
+      this.roles = cloneDeep(data.roles);
+    if (data.organizations)
+      this.organizations = cloneDeep(data.organizations);
+    if (data.notes)
+      this.notes = cloneDeep(data.notes);
   }
 }
