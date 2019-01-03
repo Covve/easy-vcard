@@ -30,6 +30,8 @@ export class Formatter {
       ...this.getRoles(vCard),
       ...this.getOrganizations(vCard),
       ...this.getNotes(vCard),
+      this.getRevision(vCard),
+      this.getUID(vCard),
       END_TOKEN
     ];
     return lines
@@ -137,6 +139,24 @@ export class Formatter {
    */
   private getNotes(vCard: VCard): string[] {
     return this.getSingleValuedProperty(vCard.notes, 'NOTE');
+  }
+
+  /**
+   * Add the REV - revision entry. Creates at most one entry.
+   */
+  private getRevision(vCard: VCard): string {
+    const rev = vCard.revision;
+    if(!rev || !rev.value) return '';
+    return 'REV' + this.getFormattedParams(rev.params) + ':' + this.e(rev.value);
+  }
+
+  /**
+   * Add the UID - user id entry. Creates at most one entry.
+   */
+  private getUID(vCard: VCard): string {
+    const uid = vCard.uid;
+    if(!uid || !uid.value) return '';
+    return 'UID' + this.getFormattedParams(uid.params) + ':' + this.e(uid.value);
   }
 
   /**

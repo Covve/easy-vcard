@@ -55,6 +55,8 @@ export interface IVCard {
   roles?: ISingleValueProperty[];
   organizations?: IMultiValueProperty[];
   notes?: ISingleValueProperty[];
+  revision?: ISingleValueProperty;
+  uid?: ISingleValueProperty;
 }
 
 export class VCard implements IVCard {
@@ -66,6 +68,8 @@ export class VCard implements IVCard {
   public roles: ISingleValueProperty[] = [];
   public organizations: IMultiValueProperty[] = [];
   public notes: ISingleValueProperty[] = [];
+  public revision: ISingleValueProperty = {};
+  public uid: ISingleValueProperty = {}
    
   constructor(data?: IVCard) {
     if (!data) return;
@@ -85,5 +89,9 @@ export class VCard implements IVCard {
       this.organizations = cloneDeep(data.organizations);
     if (data.notes)
       this.notes = cloneDeep(data.notes);
+    if (data.revision)
+      this.revision = cloneDeep(data.revision);
+    if (data.uid)
+      this.uid = cloneDeep(data.uid);
   }
 }

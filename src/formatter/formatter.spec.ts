@@ -330,7 +330,35 @@ describe('Formatter', () => {
                                       'END:VCARD');
   });
 
+  it('formats a VCard with a revision', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
 
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.revision = { value: 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6' };
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'REV:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with a revision', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.uid = { value: 'urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6' };
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                                      'END:VCARD');
+  });
 
   describe('params', () => {
     it('formats all params', () => {
@@ -391,6 +419,52 @@ describe('Formatter', () => {
                                         'VERSION:4.0\r\n' +
                                         'FN' + expectedParamString + ':John\r\n' +
                                         'END:VCARD');
+    });
+
+    describe('complete examples', () => {
+      it('construct a vcard then format it', () => {
+        let sut = new Formatter();
+        let vcard = new VCard();
+        vcard.name.firstNames = ['John'];
+        vcard.name.lastNames = ['Doe', 'Foo'];
+        vcard.name.honorificsPre = ['Dr.'];
+        vcard.emails.push({ value: 'jdoe@smithsonian.com' });
+        vcard.emails.push({ value: 'doesupports@smithsonian.com' });
+        vcard.uid.value = 'urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6';
+        vcard.revision.value = '1';
+        vcard.notes.push({ value: 'Jdoe\'s personal notes'});
+        vcard.phones.push({ value: '0-123456', params: { type: 'home', value: 'text' } });
+        vcard.phones.push({ value: 'tel:123-456-789', params: { type: 'work', pref: '1', value: 'uri' } });
+        vcard.titles.push({ value: 'Chief support officer' });
+        vcard.organizations.push({ values: ['Smithsonian Inc.', 'North America'] });
+        vcard.organizations.push({ values: ['Jdoe co.'] });
+        vcard.addresses.push({
+          street: '123 High Str.',
+          country: 'USA',
+          postCode: 'AB-123',
+          params: { type: 'home', label: 'Doe Residence, 123 High Str., AB-123, US' }
+        });
+        vcard.roles.push({ value: 'Support manager' });
+
+        const result = sut.format(vcard);
+        expect(result).toEqual('BEGIN:VCARD\r\n' +
+                               'VERSION:4.0\r\n' +
+                               'FN:Dr. John Doe\r\n' +
+                               'N:Doe,Foo;John;;Dr.;\r\n' +
+                               'ADR;LABEL="Doe Residence, 123 High Str., AB-123, US";TYPE=home:;;123 High Str.;;;AB-123;USA\r\n' +
+                               'TEL;VALUE=text;TYPE=home:0-123456\r\n' +
+                               'TEL;VALUE=uri;PREF=1;TYPE=work:tel:123-456-789\r\n' +
+                               'EMAIL:jdoe@smithsonian.com\r\n' +
+                               'EMAIL:doesupports@smithsonian.com\r\n' +
+                               'TITLE:Chief support officer\r\n' +
+                               'ROLE:Support manager\r\n' +
+                               'ORG:Smithsonian Inc.;North America\r\n' +
+                               'ORG:Jdoe co.\r\n' +
+                               'NOTE:Jdoe\'s personal notes\r\n' +
+                               'REV:1\r\n' +
+                               'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                               'END:VCARD');
+      });
     });
   });
 });
