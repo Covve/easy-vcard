@@ -1,12 +1,12 @@
 // TODO: line folding
-// mandatory FN or empty
 
 import { VCard, IParams, ISingleValueProperty } from "../vcard/vcard"; 
 import { isEmpty } from "lodash";
 
 const NEWLINE = '\r\n';
 const BEGIN_TOKEN = 'BEGIN:VCARD';
-const VERSION_TOKEN = 'VERSION:4.0';
+const VERSION_TOKEN_V4 = 'VERSION:4.0';
+const VERSION_TOKEN_V3 = 'VERSION:3.0';
 const END_TOKEN = 'END:VCARD';
 
 export class Formatter {
@@ -17,10 +17,10 @@ export class Formatter {
    * @param vCard - The VCard object to format
    * @returns Valid version 4 vcard string
    */
-  public format(vCard: VCard): string {
+  public format(vCard: VCard, forceV3 = false): string {
     const lines = [
       BEGIN_TOKEN,
-      VERSION_TOKEN,
+      forceV3 ? VERSION_TOKEN_V3 : VERSION_TOKEN_V4,
       this.getFullName(vCard),
       this.getNameComponents(vCard),
       ...this.getAddresses(vCard),
