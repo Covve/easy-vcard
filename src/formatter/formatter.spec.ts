@@ -345,7 +345,7 @@ describe('Formatter', () => {
                                       'END:VCARD');
   });
 
-  it('formats a VCard with a revision', () => {
+  it('formats a VCard with a uid', () => {
     let sut = new Formatter();
     let vcard = new VCard();
 

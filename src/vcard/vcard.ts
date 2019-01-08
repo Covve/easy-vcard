@@ -1,4 +1,4 @@
-import { cloneDeep } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 
 export interface IParams {
   label?: string;
@@ -69,29 +69,111 @@ export class VCard implements IVCard {
   public organizations: IMultiValueProperty[] = [];
   public notes: ISingleValueProperty[] = [];
   public revision: ISingleValueProperty = {};
-  public uid: ISingleValueProperty = {}
-   
+  public uid: ISingleValueProperty = {};
+ 
   constructor(data?: IVCard) {
     if (!data) return;
-    if (data.name)
-      this.name = cloneDeep(data.name);
-    if (data.addresses)
-      this.addresses = cloneDeep(data.addresses);
-    if (data.phones)
-      this.phones = cloneDeep(data.phones);
-    if (data.emails)
-      this.emails = cloneDeep(data.emails);
-    if (data.titles)
-      this.titles = cloneDeep(data.titles);
-    if (data.roles)
-      this.roles = cloneDeep(data.roles);
-    if (data.organizations)
-      this.organizations = cloneDeep(data.organizations);
-    if (data.notes)
-      this.notes = cloneDeep(data.notes);
-    if (data.revision)
-      this.revision = cloneDeep(data.revision);
-    if (data.uid)
-      this.uid = cloneDeep(data.uid);
+    this.name = data.name || {};
+    this.addresses = cloneDeep(data.addresses) || [];
+    this.phones = cloneDeep(data.phones) || [];
+    this.emails = cloneDeep(data.emails) || [];
+    this.titles = cloneDeep(data.titles) || [];
+    this.roles = cloneDeep(data.roles) || [];
+    this.organizations = cloneDeep(data.organizations) || [];
+    this.notes = cloneDeep(data.notes) || [];
+    this.revision = cloneDeep(data.revision) || {};
+    this.uid = cloneDeep(data.uid) || {};
+  }
+
+  public addFirstName(firstName: string): VCard {
+    if(!this.name.firstNames)
+      this.name.firstNames = [];
+    this.name.firstNames.push(firstName);
+    return this;
+  }
+
+  public addMiddleName(middleName: string): VCard {
+    if(!this.name.middleNames)
+      this.name.middleNames = [];
+    this.name.middleNames.push(middleName);
+    return this;
+  }
+
+  public addLastName(lastName: string): VCard {
+    if(!this.name.lastNames)
+      this.name.lastNames = [];
+    this.name.lastNames.push(lastName);
+    return this;
+  }
+
+  public addPrefixName(pre: string): VCard {
+    if(!this.name.honorificsPre)
+      this.name.honorificsPre = [];
+    this.name.honorificsPre.push(pre);
+    return this;
+  }
+
+  public addSuffixName(suf: string): VCard {
+    if(!this.name.honorificsSuf)
+      this.name.honorificsSuf = [];
+    this.name.honorificsSuf.push(suf);
+    return this;
+  }
+
+  public setFullName(fullname: string): VCard {
+    if(!this.name.fullNames)
+      this.name.fullNames = [];
+    this.name.fullNames.push(fullname);
+    return this;
+  }
+
+  public addAddress(street: string, locality: string, region: string,
+                    postCode: string, country: string, params?: IParams): VCard {
+    const address = { street, locality, region, postCode, country, params };
+    if (!isEmpty(address)) 
+      this.addresses.push(address);
+    return this;
+  }
+
+  public addPhone(number: string, params?: IParams): VCard {
+    this.phones.push({ value: number, params });
+    return this;
+  }
+
+  public addEmail(email: string, params?: IParams): VCard {
+    this.emails.push({ value: email, params });
+    return this;
+  }
+
+  public addTitle(title: string, params?: IParams): VCard {
+    this.titles.push({ value: title, params });
+    return this;
+  }
+
+  public addRole(role: string, params?: IParams): VCard {
+    this.roles.push({ value: role, params });
+    return this;
+  }
+
+  public addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard {
+    let values = organizationUnits.slice();
+    values.splice(0, 0, organization);
+    this.organizations.push({ values , params });
+    return this;
+  }
+
+  public addNotes(notes: string, params?: IParams): VCard {
+    this.notes.push({ value: notes, params });
+    return this;
+  }
+
+  public setRevision(rev: string, params?: IParams): VCard {
+    this.revision = { value: rev, params };
+    return this;
+  }
+
+  public setUID(uid: string, params?: IParams): VCard {
+    this.uid = { value: uid, params };
+    return this;
   }
 }
