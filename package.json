@@ -7,7 +7,11 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "lint": "tslint -p tsconfig.json",
+    "export": "tsc examples/export.ts && node examples/export.js && rm examples/export.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +26,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.10",
+    "@types/node": "^10.12.18",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.5",
     "typescript": "^2.4.2"
