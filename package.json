@@ -1,5 +1,5 @@
 {
-  "name": "easy-vcard",
+  "name": "@covve/easy-vcard",
   "version": "0.0.1",
   "description": "Simple vcard formatter",
   "main": "dist/index.js",
