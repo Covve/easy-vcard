@@ -1,4 +1,5 @@
 import { cloneDeep, isEmpty } from "lodash";
+import { Formatter } from "../formatter/formatter";
 
 export interface IParams {
   label?: string;
@@ -156,7 +157,7 @@ export class VCard implements IVCard {
   }
 
   public addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard {
-    let values = organizationUnits.slice();
+    let values = organizationUnits && organizationUnits.length ? organizationUnits.slice() : [];
     values.splice(0, 0, organization);
     this.organizations.push({ values , params });
     return this;
@@ -175,5 +176,10 @@ export class VCard implements IVCard {
   public setUID(uid: string, params?: IParams): VCard {
     this.uid = { value: uid, params };
     return this;
+  }
+
+  public toString(forceV3 = false): string {
+    const formatter = new Formatter();
+    return formatter.format(this, forceV3);
   }
 }

@@ -34,49 +34,49 @@ describe('VCard', () => {
   describe('chaining methods', () => {
     it('sets a fullname', () => {
       let sut: any = new VCard();
-      sut = sut.setFullName('John Doe');
+      sut.setFullName('John Doe');
       expect(sut.name.fullNames.length).toEqual(1);
       expect(sut.name.fullNames[0]).toEqual('John Doe');
     });
 
     it('adds a first name', () => {
       let sut: any = new VCard();
-      sut = sut.addFirstName('John');
+      sut.addFirstName('John');
       expect(sut.name.firstNames.length).toEqual(1);
       expect(sut.name.firstNames[0]).toEqual('John');
     });
 
     it('adds a middle name', () => {
       let sut: any = new VCard();
-      sut = sut.addMiddleName('K.');
+      sut.addMiddleName('K.');
       expect(sut.name.middleNames.length).toEqual(1);
       expect(sut.name.middleNames[0]).toEqual('K.');
     });
 
     it('adds a last name', () => {
       let sut: any = new VCard();
-      sut = sut.addLastName('Doe');
+      sut.addLastName('Doe');
       expect(sut.name.lastNames.length).toEqual(1);
       expect(sut.name.lastNames[0]).toEqual('Doe');
     });
 
     it('adds a name prefix', () => {
       let sut: any = new VCard();
-      sut = sut.addPrefixName('Dr.');
+      sut.addPrefixName('Dr.');
       expect(sut.name.honorificsPre.length).toEqual(1);
       expect(sut.name.honorificsPre[0]).toEqual('Dr.');
     });
 
     it('adds a name suffix', () => {
       let sut: any = new VCard();
-      sut = sut.addSuffixName('Esq.');
+      sut.addSuffixName('Esq.');
       expect(sut.name.honorificsSuf.length).toEqual(1);
       expect(sut.name.honorificsSuf[0]).toEqual('Esq.');
     });
 
     it('adds a full address', () => {
       let sut: any = new VCard();
-      sut = sut.addAddress(
+      sut.addAddress(
         'someStreet',
         'someLocality',
         'someRegion',
@@ -95,7 +95,7 @@ describe('VCard', () => {
 
     it('adds an incomplete address', () => {
       let sut: any = new VCard();
-      sut = sut.addAddress(
+      sut.addAddress(
         'someStreet',
         null,
         null,
@@ -113,56 +113,64 @@ describe('VCard', () => {
 
     it('adds a phone', () => {
       let sut = new VCard();
-      sut = sut.addPhone('123', { pref: '1' });
+      sut.addPhone('123', { pref: '1' });
       expect(sut.phones.length).toEqual(1);
       expect(sut.phones[0].value).toEqual('123');
     });
 
     it('adds an email', () => {
       let sut = new VCard();
-      sut = sut.addEmail('jdoe@smithsonian.com', { pref: '1' });
+      sut.addEmail('jdoe@smithsonian.com', { pref: '1' });
       expect(sut.emails.length).toEqual(1);
       expect(sut.emails[0].value).toEqual('jdoe@smithsonian.com');
     });
 
     it('adds a title', () => {
       let sut = new VCard();
-      sut = sut.addTitle('Engineer');
+      sut.addTitle('Engineer');
       expect(sut.titles.length).toEqual(1);
       expect(sut.titles[0].value).toEqual('Engineer');
     });
 
     it('adds a role', () => {
       let sut = new VCard();
-      sut = sut.addRole('Manager');
+      sut.addRole('Manager');
       expect(sut.roles.length).toEqual(1);
       expect(sut.roles[0].value).toEqual('Manager');
     });
 
-    it('adds an organization', () => {
+    it('adds an organization with divisions', () => {
       let sut: any = new VCard();
-      sut = sut.addOrganization('Covve', ['North America Div', 'US']);
+      sut.addOrganization('Covve', ['North America Div', 'US']);
       expect(sut.organizations.length).toEqual(1);
       expect(sut.organizations[0].values.length).toEqual(3);
       expect(sut.organizations[0].values).toEqual(['Covve', 'North America Div', 'US']);
     });
 
+    it('adds an organization without divisions', () => {
+      let sut:any = new VCard();
+      sut.addOrganization('Covve', null);
+      expect(sut.organizations.length).toEqual(1);
+      expect(sut.organizations[0].values.length).toEqual(1);
+      expect(sut.organizations[0].values).toEqual(['Covve']);
+    });
+
     it('adds notes', () => {
       let sut = new VCard();
-      sut = sut.addNotes('some notes');
+      sut.addNotes('some notes');
       expect(sut.notes.length).toEqual(1);
       expect(sut.notes[0].value).toEqual('some notes');
     });
 
     it('sets a revision', () => {
       let sut = new VCard();
-      sut = sut.setRevision('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      sut.setRevision('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
       expect(sut.revision.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
 
     it('adds a UID', () => {
       let sut = new VCard();
-      sut = sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
       expect(sut.uid.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
   });

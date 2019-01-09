@@ -100,19 +100,13 @@ Set the revision for this vcard.
 ### `setUID(uid: string, params?: IParams): VCard`
 Set the user id for this vcard.
 
-
-## Formatter methods
-
-After creating a formatter object there's only one method you can use.
-
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
-### `format(vCard: VCard, forceV3 = false): string`
-Takes a VCard object as created above and formats it into a string. Note that a forceV3 argument is included, which if true, set the VERSION property to 3.0 .
+### `toString(forceV3 = false): string`
+Takes a VCard object as created above and formats it into a string. Note that a forceV3 argument is included, which if true, sets the VERSION property to 3.0 .
 This doesn't mean that this plugin supports 3.0 vcards or earlier, it's just a workaround to get your simple vcards read by older parsers found in various devices.
 Care should be taken using this as the card might not be readable by 3.0 or older parsers.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Not yet supported
 

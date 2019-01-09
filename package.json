@@ -1,6 +1,6 @@
 {
   "name": "@covve/easy-vcard",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple vcard formatter",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,16 +21,12 @@
     "lint": "tslint -p tsconfig.json",
     "export": "tsc examples/export.ts && node examples/export.js && rm examples/export.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "placeholder"
-  },
   "keywords": [
     "vcard",
     "vcf",
     "v-card"
   ],
-  "author": "jasonasmk",
+  "author": "kaiseroskilo@gmail.com",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^23.3.10",
