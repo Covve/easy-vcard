@@ -23,6 +23,7 @@ export class Formatter {
       forceV3 ? VERSION_TOKEN_V3 : VERSION_TOKEN_V4,
       this.getFullName(vCard),
       this.getNameComponents(vCard),
+      ...this.getPhotos(vCard),
       ...this.getAddresses(vCard),
       ...this.getPhones(vCard),
       ...this.getEmails(vCard),
@@ -77,6 +78,13 @@ export class Formatter {
     if(components.every(c => c === '')) return '';
     let result = components.reduce((accumulator, current, index) => accumulator + current + (index !== 4 ? ';' : ''), '');
     return 'N:' + result;
+  }
+
+  /**
+   * Adds the PHOTO - photo entry. Creates on for each photo in vCard.photos field.
+   */
+  private getPhotos(vCard: VCard): string[] {
+    return this.getSingleValuedProperty(vCard.photos, 'PHOTO');
   }
 
   /**

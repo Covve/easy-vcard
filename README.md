@@ -56,6 +56,10 @@ Set the FN property of the vcard. This is mandatory and unique. If it doesn't ex
 Add a first name, middle name, last name, honorific prefix or honorific suffix respectively in the N property. The N property is unique if it exists.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
+### `addPhoto(uri: string, params?: IParams): VCard`
+Add a photo to a PHOTO property. `uri` can be either a link to a site where the photo is hosted or a base64 data representation.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
 
 ### `addAddress(street: string, locality: string, region: string, postCode: string, country: string, params?: IParams): VCard`
 Add an address as an ADR property. Fields not available should be null or undefined.
@@ -112,7 +116,7 @@ Care should be taken using this as the card might not be readable by 3.0 or olde
 
 The following vCard properties are not yet included but might be in the future.
 ```
-SOURCE, KIND, XML, NICKNAME, PHOTO, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
+SOURCE, KIND, XML, NICKNAME, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
 LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, URL, KEY, FBURL, CALADRURI, CALURI
 ```
 ## Contribute

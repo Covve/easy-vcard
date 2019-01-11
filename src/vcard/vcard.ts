@@ -49,6 +49,7 @@ export interface IMultiValueProperty {
 
 export interface IVCard {
   name?: IName;
+  photos?: ISingleValueProperty[];
   addresses?: IAddress[];
   phones?: ISingleValueProperty[];
   emails?: ISingleValueProperty[];
@@ -62,6 +63,7 @@ export interface IVCard {
 
 export class VCard implements IVCard {
   public name: IName = {};
+  public photos: ISingleValueProperty[] = [];
   public addresses: IAddress[] = [];
   public phones: ISingleValueProperty[] = [];
   public emails: ISingleValueProperty[] = [];
@@ -75,6 +77,7 @@ export class VCard implements IVCard {
   constructor(data?: IVCard) {
     if (!data) return;
     this.name = data.name || {};
+    this.photos = data.photos || []
     this.addresses = cloneDeep(data.addresses) || [];
     this.phones = cloneDeep(data.phones) || [];
     this.emails = cloneDeep(data.emails) || [];
@@ -125,6 +128,11 @@ export class VCard implements IVCard {
     if(!this.name.fullNames)
       this.name.fullNames = [];
     this.name.fullNames.push(fullname);
+    return this;
+  }
+
+  public addPhoto(uri: string, params?: IParams): VCard {
+    this.photos.push({ value: uri, params });
     return this;
   }
 

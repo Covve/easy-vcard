@@ -74,6 +74,13 @@ describe('VCard', () => {
       expect(sut.name.honorificsSuf[0]).toEqual('Esq.');
     });
 
+    it('adds a photo', () => {
+      let sut: any = new VCard();
+      sut.addPhoto('http://www.example.com/pub/photos/jqpublic.gif');
+      expect(sut.photos.length).toEqual(1);
+      expect(sut.photos[0].value).toEqual('http://www.example.com/pub/photos/jqpublic.gif');
+    })
+
     it('adds a full address', () => {
       let sut: any = new VCard();
       sut.addAddress(

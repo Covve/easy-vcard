@@ -49,6 +49,42 @@ describe('Formatter', () => {
                                       'END:VCARD');
   });
 
+  it('formats a VCard with a base64 photo', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.photos = [{
+      value: 'http://www.example.com/pub/photos/jqpublic.gif' 
+    }];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'PHOTO:http\://www.example.com/pub/photos/jqpublic.gif\r\n' +
+                                      'END:VCARD');
+  })
+
+  it('formats a VCard with a photo url', () => {
+    let sut = new Formatter();
+    let vcard = new VCard();
+
+    vcard.name = {
+      fullNames: ['John'],
+    };
+    vcard.photos = [{
+      value: 'data:image/jpeg;base64,MIICajCCAdOgAwIBAgICBEUwDQYJKoZIhv' 
+    }];
+
+    expect(sut.format(vcard)).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'PHOTO:data:image/jpeg\;base64,MIICajCCAdOgAwIBAgICBEUwDQYJKoZIhv\r\n' +
+                                      'END:VCARD');
+  })
+
   it('formats a VCard with an address', () => { 
     let sut = new Formatter();
     let vcard = new VCard();
