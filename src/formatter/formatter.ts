@@ -1,7 +1,7 @@
 // TODO: line folding
 
-import { VCard, IParams, ISingleValueProperty } from "../vcard/vcard"; 
-import { isEmpty } from "lodash";
+import { IVCard, IParams, ISingleValueProperty } from "../vcard/vcard";
+import isEmpty from 'lodash.isempty';
 
 const NEWLINE = '\r\n';
 const BEGIN_TOKEN = 'BEGIN:VCARD';
@@ -17,7 +17,7 @@ export class Formatter {
    * @param vCard - The VCard object to format
    * @returns Valid version 4 vcard string
    */
-  public format(vCard: VCard, forceV3 = false): string {
+  public format(vCard: IVCard, forceV3 = false): string {
     const lines = [
       BEGIN_TOKEN,
       forceV3 ? VERSION_TOKEN_V3 : VERSION_TOKEN_V4,
@@ -43,7 +43,7 @@ export class Formatter {
    * Adds the FN - formatted name entry. This property must
    * exist in a VCard.
    */
-  private getFullName(vCard: VCard): string {
+  private getFullName(vCard: IVCard): string {
     let name = vCard.name;
     if(!name) return '';
     if (name.fullNames && name.fullNames.length)
@@ -65,7 +65,7 @@ export class Formatter {
   /**
    * Adds the N - name components entry. This is optional.
    */
-  private getNameComponents(vCard: VCard): string {
+  private getNameComponents(vCard: IVCard): string {
     let name = vCard.name;
     if(!name) return '';
     const components = [
@@ -83,19 +83,19 @@ export class Formatter {
   /**
    * Adds the PHOTO - photo entry. Creates on for each photo in vCard.photos field.
    */
-  private getPhotos(vCard: VCard): string[] {
+  private getPhotos(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.photos, 'PHOTO');
   }
 
   /**
    * Adds the ADR - address entry. Creates one for each address in vCard.phones field.
    */
-  private getAddresses(vCard: VCard): string[] {
+  private getAddresses(vCard: IVCard): string[] {
     let addresses = vCard.addresses;
     if(!addresses || !addresses.length) return [];
     return addresses
       .filter(addr => !!addr && !isEmpty(addr))
-      .map((addr) => 
+      .map((addr) =>
          'ADR' + this.getFormattedParams(addr.params) + ':;;' +
           this.e(addr.street) + ';' + this.e(addr.locality) + ';' +
           this.e(addr.region) + ';' + this.e(addr.postCode) + ';' +
@@ -106,35 +106,35 @@ export class Formatter {
   /**
    * Adds the TEL - telephone entry. Creates one for each phone in the vCard.phones field.
    */
-  private getPhones(vCard: VCard): string[] {
+  private getPhones(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.phones, 'TEL');
   }
 
   /**
    * Adds the EMAIL - email entry. Creates one for each email in the vCard.emails field.
    */
-  private getEmails(vCard: VCard): string[] {
+  private getEmails(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.emails, 'EMAIL');
   }
 
   /**
    * Add the TITLE - job title entry. Creates one for each title in the vCard.titles field.
    */
-  private getTitles(vCard: VCard): string[] {
+  private getTitles(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.titles, 'TITLE');
   }
 
   /**
    * Add the ROLE - job role entry. Creates one for each role in the vCard.roles field.
    */
-  private getRoles(vCard: VCard): string[] {
+  private getRoles(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.roles, 'ROLE');
   }
 
   /**
    * Add the ORG - organization entry. Creates one for each organization in vCard.organizations
    */
-  private getOrganizations(vCard: VCard): string[] {  
+  private getOrganizations(vCard: IVCard): string[] {
     const orgs = vCard.organizations;
     if(!orgs || !orgs.length) return [];
     return orgs
@@ -145,14 +145,14 @@ export class Formatter {
   /**
    * Add the NOTE - note entry. Creates one for each note in vCard.notes
    */
-  private getNotes(vCard: VCard): string[] {
+  private getNotes(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.notes, 'NOTE');
   }
 
   /**
    * Add the REV - revision entry. Creates at most one entry.
    */
-  private getRevision(vCard: VCard): string {
+  private getRevision(vCard: IVCard): string {
     const rev = vCard.revision;
     if(!rev || !rev.value) return '';
     return 'REV' + this.getFormattedParams(rev.params) + ':' + this.e(rev.value);
@@ -161,7 +161,7 @@ export class Formatter {
   /**
    * Add the UID - user id entry. Creates at most one entry.
    */
-  private getUID(vCard: VCard): string {
+  private getUID(vCard: IVCard): string {
     const uid = vCard.uid;
     if(!uid || !uid.value) return '';
     return 'UID' + this.getFormattedParams(uid.params) + ':' + this.e(uid.value);
@@ -170,7 +170,7 @@ export class Formatter {
   /**
    * Escape non valid characters according to RFC.
    * Those characters are comma, semicolon, backslash and newlines.
-   * 
+   *
    */
   private e(s: string | undefined): string {
     if(!s) return '';
