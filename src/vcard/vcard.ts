@@ -1,6 +1,6 @@
-import isEmpty from "lodash.isempty";
-import cloneDeep from "lodash.clonedeep";
-import { Formatter } from "../formatter/formatter";
+import isEmpty from 'lodash.isempty';
+import cloneDeep from 'lodash.clonedeep';
+import { Formatter } from '../formatter/formatter';
 
 export interface IParams {
   label?: string;
@@ -50,7 +50,8 @@ export interface IMultiValueProperty {
 
 export interface IVCard {
   name: IName;
-  addresses?: IAddress[];
+  photos: ISingleValueProperty[];
+  addresses: IAddress[];
   phones: ISingleValueProperty[];
   emails: ISingleValueProperty[];
   titles: ISingleValueProperty[];
@@ -65,6 +66,7 @@ const formatter = new Formatter();
 
 export class VCard {
   private _name: IName = {};
+  private _photos: ISingleValueProperty[] = [];
   private _addresses: IAddress[] = [];
   private _phones: ISingleValueProperty[] = [];
   private _emails: ISingleValueProperty[] = [];
@@ -79,6 +81,7 @@ export class VCard {
     if (!data) return;
     data = cloneDeep(data);
     this._name = data.name || {};
+    this._photos = data.photos || []
     this._addresses = data.addresses || [];
     this._phones = data.phones || [];
     this._emails = data.emails || [];
@@ -105,11 +108,11 @@ export class VCard {
     })
   }
 
-  public toVcard() {
-    return formatter.format(this.toJSON());
+  public toVcard(forceV3 = false): string {
+    return formatter.format(this.toJSON(), forceV3);
   }
 
-  public toString() {
+  public toString(forceV3 = false): string {
     return this.toVcard();
   }
 
@@ -150,6 +153,11 @@ export class VCard {
     return this;
   }
 
+  public addPhoto(uri: string, params?: IParams): VCard {
+    this._photos.push({ value: uri, params });
+    return this;
+  }
+
   public addAddress(street: string, locality: string, region: string,
                     postCode: string, country: string, params?: IParams): VCard {
     this._addresses = this._addresses || [];
@@ -184,7 +192,7 @@ export class VCard {
   }
 
   public addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard {
-    let values = organizationUnits.slice();
+    let values = organizationUnits && organizationUnits.length ? organizationUnits.slice() : [];
     values.splice(0, 0, organization);
 
     this._organizations = this._organizations || [];

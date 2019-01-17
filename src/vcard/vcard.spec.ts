@@ -23,7 +23,7 @@ describe('VCard', () => {
   describe('chaining methods', () => {
     it('sets a fullname', () => {
       let sut = new VCard();
-      sut = sut.setFullName('John Doe');
+      sut.setFullName('John Doe');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.fullNames!.length).toEqual(1);
@@ -32,7 +32,7 @@ describe('VCard', () => {
 
     it('adds a first name', () => {
       let sut = new VCard();
-      sut = sut.addFirstName('John');
+      sut.addFirstName('John');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.firstNames!.length).toEqual(1);
@@ -41,7 +41,7 @@ describe('VCard', () => {
 
     it('adds a middle name', () => {
       let sut = new VCard();
-      sut = sut.addMiddleName('K.');
+      sut.addMiddleName('K.');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.middleNames!.length).toEqual(1);
@@ -50,7 +50,7 @@ describe('VCard', () => {
 
     it('adds a last name', () => {
       let sut = new VCard();
-      sut = sut.addLastName('Doe');
+      sut.addLastName('Doe');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.lastNames!.length).toEqual(1);
@@ -59,7 +59,7 @@ describe('VCard', () => {
 
     it('adds a name prefix', () => {
       let sut = new VCard();
-      sut = sut.addPrefixName('Dr.');
+      sut.addPrefixName('Dr.');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.honorificsPre!.length).toEqual(1);
@@ -68,16 +68,23 @@ describe('VCard', () => {
 
     it('adds a name suffix', () => {
       let sut = new VCard();
-      sut = sut.addSuffixName('Esq.');
+      sut.addSuffixName('Esq.');
       const name = sut.toJSON().name;
       expect(name.fullNames).toBeDefined();
       expect(name.honorificsSuf!.length).toEqual(1);
       expect(name.honorificsSuf![0]).toEqual('Esq.');
     });
 
+    it('adds a photo', () => {
+      let sut: any = new VCard();
+      sut.addPhoto('http://www.example.com/pub/photos/jqpublic.gif');
+      expect(sut.photos.length).toEqual(1);
+      expect(sut.photos[0].value).toEqual('http://www.example.com/pub/photos/jqpublic.gif');
+    })
+
     it('adds a full address', () => {
       let sut = new VCard();
-      sut = sut.addAddress(
+      sut.addAddress(
         'someStreet',
         'someLocality',
         'someRegion',
@@ -116,7 +123,7 @@ describe('VCard', () => {
 
     it('adds a phone', () => {
       let sut = new VCard();
-      sut = sut.addPhone('123', { pref: '1' });
+      sut.addPhone('123', { pref: '1' });
       const phones = sut.toJSON().phones;
       expect(phones.length).toEqual(1);
       expect(phones[0].value).toEqual('123');
@@ -124,7 +131,7 @@ describe('VCard', () => {
 
     it('adds an email', () => {
       let sut = new VCard();
-      sut = sut.addEmail('jdoe@smithsonian.com', { pref: '1' });
+      sut.addEmail('jdoe@smithsonian.com', { pref: '1' });
       const emails = sut.toJSON().emails;
       expect(emails.length).toEqual(1);
       expect(emails[0].value).toEqual('jdoe@smithsonian.com');
@@ -132,7 +139,7 @@ describe('VCard', () => {
 
     it('adds a title', () => {
       let sut = new VCard();
-      sut = sut.addTitle('Engineer');
+      sut.addTitle('Engineer');
       const titles = sut.toJSON().titles;
       expect(titles.length).toEqual(1);
       expect(titles[0].value).toEqual('Engineer');
@@ -140,24 +147,32 @@ describe('VCard', () => {
 
     it('adds a role', () => {
       let sut = new VCard();
-      sut = sut.addRole('Manager');
+      sut.addRole('Manager');
       const roles = sut.toJSON().roles;
       expect(roles.length).toEqual(1);
       expect(roles[0].value).toEqual('Manager');
     });
 
-    it('adds an organization', () => {
+    it('adds an organization with divisions', () => {
       let sut = new VCard();
-      sut = sut.addOrganization('Covve', ['North America Div', 'US']);
+      sut.addOrganization('Covve', ['North America Div', 'US']);
       const organizations = sut.toJSON().organizations;
       expect(organizations.length).toEqual(1);
       expect(organizations[0].values!.length).toEqual(3);
       expect(organizations[0].values).toEqual(['Covve', 'North America Div', 'US']);
     });
 
+    it('adds an organization without divisions', () => {
+      let sut:any = new VCard();
+      sut.addOrganization('Covve', null);
+      expect(sut.organizations.length).toEqual(1);
+      expect(sut.organizations[0].values.length).toEqual(1);
+      expect(sut.organizations[0].values).toEqual(['Covve']);
+    });
+
     it('adds notes', () => {
       let sut = new VCard();
-      sut = sut.addNotes('some notes');
+      sut.addNotes('some notes');
       const notes = sut.toJSON().notes;
       expect(notes.length).toEqual(1);
       expect(notes[0].value).toEqual('some notes');
@@ -165,13 +180,13 @@ describe('VCard', () => {
 
     it('sets a revision', () => {
       let sut = new VCard();
-      sut = sut.setRevision('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      sut.setRevision('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
       expect(sut.toJSON().revision.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
 
     it('adds a UID', () => {
       let sut = new VCard();
-      sut = sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
       expect(sut.toJSON().uid.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
   });
