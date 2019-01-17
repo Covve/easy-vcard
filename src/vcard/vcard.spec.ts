@@ -34,7 +34,7 @@ describe('VCard', () => {
       let sut = new VCard();
       sut.addFirstName('John');
       const name = sut.toJSON().name;
-      expect(name.fullNames).toBeDefined();
+      expect(name.firstNames).toBeDefined();
       expect(name.firstNames!.length).toEqual(1);
       expect(name.firstNames![0]).toEqual('John');
     });
@@ -43,7 +43,7 @@ describe('VCard', () => {
       let sut = new VCard();
       sut.addMiddleName('K.');
       const name = sut.toJSON().name;
-      expect(name.fullNames).toBeDefined();
+      expect(name.middleNames).toBeDefined();
       expect(name.middleNames!.length).toEqual(1);
       expect(name.middleNames![0]).toEqual('K.');
     });
@@ -52,7 +52,7 @@ describe('VCard', () => {
       let sut = new VCard();
       sut.addLastName('Doe');
       const name = sut.toJSON().name;
-      expect(name.fullNames).toBeDefined();
+      expect(name.lastNames).toBeDefined();
       expect(name.lastNames!.length).toEqual(1);
       expect(name.lastNames![0]).toEqual('Doe');
     });
@@ -61,7 +61,7 @@ describe('VCard', () => {
       let sut = new VCard();
       sut.addPrefixName('Dr.');
       const name = sut.toJSON().name;
-      expect(name.fullNames).toBeDefined();
+      expect(name.honorificsPre).toBeDefined();
       expect(name.honorificsPre!.length).toEqual(1);
       expect(name.honorificsPre![0]).toEqual('Dr.');
     });
@@ -70,7 +70,7 @@ describe('VCard', () => {
       let sut = new VCard();
       sut.addSuffixName('Esq.');
       const name = sut.toJSON().name;
-      expect(name.fullNames).toBeDefined();
+      expect(name.honorificsSuf).toBeDefined();
       expect(name.honorificsSuf!.length).toEqual(1);
       expect(name.honorificsSuf![0]).toEqual('Esq.');
     });
@@ -78,8 +78,9 @@ describe('VCard', () => {
     it('adds a photo', () => {
       let sut: any = new VCard();
       sut.addPhoto('http://www.example.com/pub/photos/jqpublic.gif');
-      expect(sut.photos.length).toEqual(1);
-      expect(sut.photos[0].value).toEqual('http://www.example.com/pub/photos/jqpublic.gif');
+      const photos = sut.toJSON().photos;
+      expect(photos.length).toEqual(1);
+      expect(photos[0].value).toEqual('http://www.example.com/pub/photos/jqpublic.gif');
     })
 
     it('adds a full address', () => {
@@ -163,11 +164,12 @@ describe('VCard', () => {
     });
 
     it('adds an organization without divisions', () => {
-      let sut:any = new VCard();
+      let sut: any = new VCard();
       sut.addOrganization('Covve', null);
-      expect(sut.organizations.length).toEqual(1);
-      expect(sut.organizations[0].values.length).toEqual(1);
-      expect(sut.organizations[0].values).toEqual(['Covve']);
+      const organizations = sut.toJSON().organizations;
+      expect(organizations.length).toEqual(1);
+      expect(organizations[0].values.length).toEqual(1);
+      expect(organizations[0].values).toEqual(['Covve']);
     });
 
     it('adds notes', () => {

@@ -93,9 +93,10 @@ export class VCard {
     this._uid = data.uid || {};
   }
 
-  public toJSON() {
+  public toJSON(): IVCard {
     return cloneDeep({
       name: this._name,
+      photos: this._photos,
       addresses: this._addresses,
       phones: this._phones,
       emails: this._emails,
@@ -113,7 +114,7 @@ export class VCard {
   }
 
   public toString(forceV3 = false): string {
-    return this.toVcard();
+    return this.toVcard(forceV3);
   }
 
   /** Helper methods for editing after initialization **/

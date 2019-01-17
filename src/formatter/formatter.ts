@@ -83,7 +83,7 @@ export class Formatter {
   /**
    * Adds the PHOTO - photo entry. Creates on for each photo in vCard.photos field.
    */
-  private getPhotos(vCard: VCard): string[] {
+  private getPhotos(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.photos, 'PHOTO');
   }
 
