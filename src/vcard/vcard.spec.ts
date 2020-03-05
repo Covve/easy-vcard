@@ -103,24 +103,24 @@ describe('VCard', () => {
       expect(addresses[0].params!.type).toEqual('home');
     });
 
-    // it('adds an incomplete address', () => {
-    //   let sut = new VCard();
-    //   sut = sut.addAddress(
-    //     'someStreet',
-    //     null,
-    //     null,
-    //     null,
-    //     'someCountry'
-    //   );
-    //   const addresses = sut.toJSON().addresses;
-    //   expect(addresses.length).toEqual(1);
-    //   expect(addresses[0].street).toEqual('someStreet');
-    //   expect(addresses[0].locality).toBeNull();
-    //   expect(addresses[0].region).toBeNull();
-    //   expect(addresses[0].postCode).toBeNull();
-    //   expect(addresses[0].country).toEqual('someCountry');
-    //   expect(addresses[0].params).toEqual(undefined);
-    // });
+    it('adds an incomplete address', () => {
+      let sut = new VCard();
+      sut = sut.addAddress(
+        'someStreet',
+        '',
+        '',
+        '',
+        'someCountry'
+      );
+      const addresses = sut.toJSON().addresses;
+      expect(addresses.length).toEqual(1);
+      expect(addresses[0].street).toEqual('someStreet');
+      expect(addresses[0].locality).toEqual('');
+      expect(addresses[0].region).toEqual('');
+      expect(addresses[0].postCode).toEqual('');
+      expect(addresses[0].country).toEqual('someCountry');
+      expect(addresses[0].params).toEqual(undefined);
+    });
 
     it('adds a phone', () => {
       let sut = new VCard();
@@ -191,5 +191,13 @@ describe('VCard', () => {
       sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
       expect(sut.toJSON().uid.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
+
+    it('adds a url', () => {
+      let sut = new VCard();
+      sut.addUrl('https://www.test.com');
+      const url = sut.toJSON().url;
+      expect(url.length).toEqual(1);
+      expect(url[0].value).toEqual('https://www.test.com');
+    })
   });
 });
