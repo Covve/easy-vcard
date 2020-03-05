@@ -93,7 +93,7 @@ describe('VCard', () => {
         'someCountry',
         { type: 'home' }
       );
-      const addresses = sut.toJSON().addresses;
+      const addresses = sut.toJSON().addresses || [];
       expect(addresses.length).toEqual(1);
       expect(addresses[0].street).toEqual('someStreet');
       expect(addresses[0].locality).toEqual('someLocality');
@@ -112,7 +112,7 @@ describe('VCard', () => {
         '',
         'someCountry'
       );
-      const addresses = sut.toJSON().addresses;
+      const addresses = sut.toJSON().addresses || [];
       expect(addresses.length).toEqual(1);
       expect(addresses[0].street).toEqual('someStreet');
       expect(addresses[0].locality).toEqual('');
@@ -125,7 +125,7 @@ describe('VCard', () => {
     it('adds a phone', () => {
       let sut = new VCard();
       sut.addPhone('123', { pref: '1' });
-      const phones = sut.toJSON().phones;
+      const phones = sut.toJSON().phones || [];
       expect(phones.length).toEqual(1);
       expect(phones[0].value).toEqual('123');
     });
@@ -133,7 +133,7 @@ describe('VCard', () => {
     it('adds an email', () => {
       let sut = new VCard();
       sut.addEmail('jdoe@smithsonian.com', { pref: '1' });
-      const emails = sut.toJSON().emails;
+      const emails = sut.toJSON().emails || [];
       expect(emails.length).toEqual(1);
       expect(emails[0].value).toEqual('jdoe@smithsonian.com');
     });
@@ -141,7 +141,7 @@ describe('VCard', () => {
     it('adds a title', () => {
       let sut = new VCard();
       sut.addTitle('Engineer');
-      const titles = sut.toJSON().titles;
+      const titles = sut.toJSON().titles || [];
       expect(titles.length).toEqual(1);
       expect(titles[0].value).toEqual('Engineer');
     });
@@ -149,7 +149,7 @@ describe('VCard', () => {
     it('adds a role', () => {
       let sut = new VCard();
       sut.addRole('Manager');
-      const roles = sut.toJSON().roles;
+      const roles = sut.toJSON().roles || [];
       expect(roles.length).toEqual(1);
       expect(roles[0].value).toEqual('Manager');
     });
@@ -157,7 +157,7 @@ describe('VCard', () => {
     it('adds an organization with divisions', () => {
       let sut = new VCard();
       sut.addOrganization('Covve', ['North America Div', 'US']);
-      const organizations = sut.toJSON().organizations;
+      const organizations = sut.toJSON().organizations || [];
       expect(organizations.length).toEqual(1);
       expect(organizations[0].values!.length).toEqual(3);
       expect(organizations[0].values).toEqual(['Covve', 'North America Div', 'US']);
@@ -175,7 +175,7 @@ describe('VCard', () => {
     it('adds notes', () => {
       let sut = new VCard();
       sut.addNotes('some notes');
-      const notes = sut.toJSON().notes;
+      const notes = sut.toJSON().notes || [];
       expect(notes.length).toEqual(1);
       expect(notes[0].value).toEqual('some notes');
     });
@@ -183,19 +183,21 @@ describe('VCard', () => {
     it('sets a revision', () => {
       let sut = new VCard();
       sut.setRevision('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
-      expect(sut.toJSON().revision.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      const rev = sut.toJSON().revision || {};
+      expect(rev.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
 
     it('adds a UID', () => {
       let sut = new VCard();
       sut.setUID('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
-      expect(sut.toJSON().uid.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
+      const uid = sut.toJSON().uid || {};
+      expect(uid.value).toEqual('f81d4fae-7dec-11d0-a765-00a0c91e6bf6');
     });
 
     it('adds a url', () => {
       let sut = new VCard();
       sut.addUrl('https://www.test.com');
-      const url = sut.toJSON().url;
+      const url = sut.toJSON().url || [];
       expect(url.length).toEqual(1);
       expect(url[0].value).toEqual('https://www.test.com');
     })
