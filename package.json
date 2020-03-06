@@ -1,6 +1,6 @@
 {
   "name": "@covve/easy-vcard",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Simple vcard formatter",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
