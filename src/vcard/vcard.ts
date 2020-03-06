@@ -1,6 +1,6 @@
-import isEmpty from 'lodash.isempty';
-import cloneDeep from 'lodash.clonedeep';
 import { Formatter } from '../formatter/formatter';
+import isEmpty = require('lodash.isempty');
+import cloneDeep = require('lodash.clonedeep');
 
 export interface IParams {
   label?: string;
@@ -50,16 +50,17 @@ export interface IMultiValueProperty {
 
 export interface IVCard {
   name: IName;
-  photos: ISingleValueProperty[];
-  addresses: IAddress[];
-  phones: ISingleValueProperty[];
-  emails: ISingleValueProperty[];
-  titles: ISingleValueProperty[];
-  roles: ISingleValueProperty[];
-  organizations: IMultiValueProperty[];
-  notes: ISingleValueProperty[];
-  revision: ISingleValueProperty;
-  uid: ISingleValueProperty;
+  photos?: ISingleValueProperty[];
+  addresses?: IAddress[];
+  phones?: ISingleValueProperty[];
+  emails?: ISingleValueProperty[];
+  titles?: ISingleValueProperty[];
+  roles?: ISingleValueProperty[];
+  organizations?: IMultiValueProperty[];
+  notes?: ISingleValueProperty[];
+  revision?: ISingleValueProperty;
+  uid?: ISingleValueProperty;
+  url?: ISingleValueProperty[];
 }
 
 const formatter = new Formatter();
@@ -76,6 +77,7 @@ export class VCard {
   private _notes: ISingleValueProperty[] = [];
   private _revision: ISingleValueProperty = {};
   private _uid: ISingleValueProperty = {};
+  private _url: ISingleValueProperty[] = [];
 
   constructor(data?: Partial<IVCard>) {
     if (!data) return;
@@ -91,6 +93,7 @@ export class VCard {
     this._notes = data.notes || [];
     this._revision = data.revision || {};
     this._uid = data.uid || {};
+    this._url = data.url || [];
   }
 
   public toJSON(): IVCard {
@@ -105,7 +108,8 @@ export class VCard {
       organizations: this._organizations,
       notes: this._notes,
       revision: this._revision,
-      uid: this._uid
+      uid: this._uid,
+      url: this._url
     })
   }
 
@@ -204,6 +208,12 @@ export class VCard {
   public addNotes(notes: string, params?: IParams): VCard {
     this._notes = this._notes || [];
     this._notes.push({ value: notes, params });
+    return this;
+  }
+
+  public addUrl(url: string, params?: IParams): VCard {
+    this._url = this._url || [];
+    this._url.push({ value: url, params });
     return this;
   }
 

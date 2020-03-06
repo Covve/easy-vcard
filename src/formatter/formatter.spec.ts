@@ -1,5 +1,5 @@
-import { Formatter } from "./formatter";
 import { VCard } from "../vcard/vcard";
+import { Formatter } from "./formatter";
 
 describe('Formatter', () => {
   it('prints a VCard with fullName', () => {
@@ -56,7 +56,7 @@ describe('Formatter', () => {
         fullNames: ['John']
       },
       photos: [{
-        value: 'http://www.example.com/pub/photos/jqpublic.gif' 
+        value: 'http://www.example.com/pub/photos/jqpublic.gif'
       }]
     });
 
@@ -74,7 +74,7 @@ describe('Formatter', () => {
         fullNames: ['John']
       },
       photos: [{
-        value: 'data:image/jpeg;base64,MIICajCCAdOgAwIBAgICBEUwDQYJKoZIhv' 
+        value: 'data:image/jpeg;base64,MIICajCCAdOgAwIBAgICBEUwDQYJKoZIhv'
       }]
     });
 
@@ -85,7 +85,7 @@ describe('Formatter', () => {
                                       'END:VCARD');
   })
 
-  it('formats a VCard with an address', () => { 
+  it('formats a VCard with an address', () => {
     let sut = new Formatter();
     let vcard: any = new VCard({
       name: {
@@ -107,7 +107,7 @@ describe('Formatter', () => {
                                       'END:VCARD');
   });
 
-  it('formats a VCard with addresses in a more complicated scenario', () => { 
+  it('formats a VCard with addresses in a more complicated scenario', () => {
     let sut = new Formatter();
     let vcard: any = new VCard({
       name: {
@@ -188,7 +188,7 @@ describe('Formatter', () => {
         fullNames: ['John']
       },
       emails: [
-        { 
+        {
           value: 'jdoe@smithsonian.com',
           params: { type: 'work', pref: '1' }
         }
@@ -219,7 +219,7 @@ describe('Formatter', () => {
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
                                       'EMAIL;PREF=1;TYPE=work:jdoe@smithsoni\\nan.com\r\n' +
-                                      'EMAIL:jdo\,e2@smith sonian.com\r\n' + 
+                                      'EMAIL:jdo\,e2@smith sonian.com\r\n' +
                                       'END:VCARD');
   });
 
@@ -256,7 +256,7 @@ describe('Formatter', () => {
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
                                       'TITLE;PID=1:Chief\, officer\\n\r\n' +
-                                      'TITLE;ALTID=3;PID=2:Father of 3\r\n' + 
+                                      'TITLE;ALTID=3;PID=2:Father of 3\r\n' +
                                       'END:VCARD');
   });
 
@@ -293,7 +293,7 @@ describe('Formatter', () => {
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
                                       'ROLE;PID=1:Project\, Lead\;-er\\n\r\n' +
-                                      'ROLE;ALTID=3;PID=2:\\n\\nFounder\r\n' + 
+                                      'ROLE;ALTID=3;PID=2:\\n\\nFounder\r\n' +
                                       'END:VCARD');
   });
 
@@ -367,7 +367,44 @@ describe('Formatter', () => {
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
                                       'NOTE;LANGUAGE=En:Something noted\\nwith many\\nlines\, of text\r\n' +
-                                      'NOTE:\\nAnother note\r\n' + 
+                                      'NOTE:\\nAnother note\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with a url entry', () => {
+    let sut = new Formatter();
+    let vcard: any = new VCard({
+      name: {
+        fullNames: ['John']
+      },
+      url: [{ value: 'https://www.covve.com' } ]
+    });
+
+    expect(sut.format(vcard.toJSON())).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'URL:https://www.covve.com\r\n' +
+                                      'END:VCARD');
+  });
+
+  it('formats a VCard with urls in a more complicated scenario', () => {
+    let sut = new Formatter();
+    let vcard: any = new VCard({
+      name: {
+        fullNames: ['John']
+      },
+      url: [
+        { value: 'http://covve.com', params: { mediatype: 'text/plain' } },
+        { value: '\ncovve.com\n\n' },
+        {}
+      ]
+    });
+
+    expect(sut.format(vcard.toJSON())).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John\r\n' +
+                                      'URL;MEDIATYPE=text/plain:http://covve.com\r\n' +
+                                      'URL:\\ncovve.com\\n\\n\r\n' +
                                       'END:VCARD');
   });
 
@@ -382,7 +419,7 @@ describe('Formatter', () => {
     expect(sut.format(vcard.toJSON())).toEqual('BEGIN:VCARD\r\n' +
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
-                                      'REV:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                                      'REV:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' +
                                       'END:VCARD');
   });
 
@@ -397,7 +434,7 @@ describe('Formatter', () => {
     expect(sut.format(vcard.toJSON())).toEqual('BEGIN:VCARD\r\n' +
                                       'VERSION:4.0\r\n' +
                                       'FN:John\r\n' +
-                                      'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                                      'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' +
                                       'END:VCARD');
   });
 
@@ -518,7 +555,7 @@ describe('Formatter', () => {
                                'ORG:Jdoe co.\r\n' +
                                'NOTE:Jdoe\'s personal notes\r\n' +
                                'REV:1\r\n' +
-                               'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' + 
+                               'UID:urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6\r\n' +
                                'END:VCARD');
       });
     });

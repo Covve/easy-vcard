@@ -1,7 +1,7 @@
 // TODO: line folding
 
-import { IVCard, IParams, ISingleValueProperty } from "../vcard/vcard";
-import isEmpty from 'lodash.isempty';
+import { IName, IParams, ISingleValueProperty, IVCard } from '../vcard/vcard';
+import isEmpty = require("lodash.isempty");
 
 const NEWLINE = '\r\n';
 const BEGIN_TOKEN = 'BEGIN:VCARD';
@@ -31,6 +31,7 @@ export class Formatter {
       ...this.getRoles(vCard),
       ...this.getOrganizations(vCard),
       ...this.getNotes(vCard),
+      ...this.getUrl(vCard),
       this.getRevision(vCard),
       this.getUID(vCard),
       END_TOKEN
@@ -45,7 +46,8 @@ export class Formatter {
    */
   private getFullName(vCard: IVCard): string {
     let name = vCard.name;
-    if(!name) return '';
+    if(!name || this.checkIfNameExists(name))
+      throw new Error('tried to format a vcard that had no name entry while name is mandatory');
     if (name.fullNames && name.fullNames.length)
       return 'FN' + this.getFormattedParams(name.params) + ':' + this.e(name.fullNames[0]);
     else if(name) {
@@ -168,6 +170,13 @@ export class Formatter {
   }
 
   /**
+   * Add a URL - uniform resource locator entry. Creates one for each note in vCard.url
+   */
+  private getUrl(vCard: IVCard): string[] {
+    return this.getSingleValuedProperty(vCard.url, 'URL');
+  }
+
+  /**
    * Escape non valid characters according to RFC.
    * Those characters are comma, semicolon, backslash and newlines.
    *
@@ -261,10 +270,22 @@ export class Formatter {
     return result;
   }
 
-  private getSingleValuedProperty(entities: ISingleValueProperty[], propertyIdentifier: string): string[] {
+  private getSingleValuedProperty(entities: ISingleValueProperty[] | undefined, propertyIdentifier: string): string[] {
     if(!entities || !entities.length) return [];
     return entities
       .filter(entity => !!entity && entity.value)
       .map((entity) => propertyIdentifier + this.getFormattedParams(entity.params) + ':' + this.e(entity.value));
+  }
+
+  private checkIfNameExists(name: IName): boolean{
+    return (!name ||
+      (isEmpty(name.fullNames)
+       && isEmpty(name.firstNames)
+       && isEmpty(name.middleNames)
+       && isEmpty(name.lastNames)
+       && isEmpty(name.honorificsPre)
+       && isEmpty(name.honorificsSuf)
+      )
+    );
   }
 }

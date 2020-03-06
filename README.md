@@ -96,6 +96,11 @@ Add a notes entry in a NOTE property.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
+### `addUrl(url: string, params?: IParams): VCard`
+Add a url entry in a URL property
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
 ### `setRevision(rev: string, params?: IParams): VCard`
 Set the revision for this vcard.
 
@@ -117,7 +122,7 @@ Care should be taken using this as the card might not be readable by 3.0 or olde
 The following vCard properties are not yet included but might be in the future.
 ```
 SOURCE, KIND, XML, NICKNAME, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
-LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, URL, KEY, FBURL, CALADRURI, CALURI
+LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, KEY, FBURL, CALADRURI, CALURI
 ```
 ## Contribute
 
