@@ -14,6 +14,7 @@
   },
   "scripts": {
     "test": "jest",
+    "test:circleCI": "jest --ci --runInBand",
     "test:watch": "jest --watch",
     "build": "tsc",
     "prepare": "npm run build",

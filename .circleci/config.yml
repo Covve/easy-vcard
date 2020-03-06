@@ -1,0 +1,24 @@
+defaults: &defaults
+  working_directory: ~/easy-vcard
+  docker:
+    - image: circleci/node:10.12
+
+version: 2
+jobs:
+  build:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/easy-vcard
+      - checkout
+      - run:
+          name: install node modules
+          command: npm install --unsafe-perm=true --no-save
+      - run:
+          name: test easy-vcard
+          command: npm run test:circleCI
+      - store_test_results:
+          path: ~/xapp/test_results
+      - run:
+          name: build easy-vcard
+          command: npm run build
