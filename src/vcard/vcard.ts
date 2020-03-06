@@ -82,18 +82,18 @@ export class VCard {
   constructor(data?: Partial<IVCard>) {
     if (!data) return;
     data = cloneDeep(data);
-    this._name = data.name || {};
-    this._photos = data.photos || []
-    this._addresses = data.addresses || [];
-    this._phones = data.phones || [];
-    this._emails = data.emails || [];
-    this._titles = data.titles || [];
-    this._roles = data.roles || [];
-    this._organizations = data.organizations || [];
-    this._notes = data.notes || [];
-    this._revision = data.revision || {};
-    this._uid = data.uid || {};
-    this._url = data.url || [];
+    this._name = data.name ?? {};
+    this._photos = data.photos ?? []
+    this._addresses = data.addresses ?? [];
+    this._phones = data.phones ?? [];
+    this._emails = data.emails ?? [];
+    this._titles = data.titles ?? [];
+    this._roles = data.roles ?? [];
+    this._organizations = data.organizations ?? [];
+    this._notes = data.notes ?? [];
+    this._revision = data.revision ?? {};
+    this._uid = data.uid ?? {};
+    this._url = data.url ?? [];
   }
 
   public toJSON(): IVCard {
