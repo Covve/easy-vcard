@@ -23,6 +23,7 @@ export class Formatter {
       forceV3 ? VERSION_TOKEN_V3 : VERSION_TOKEN_V4,
       this.getFullName(vCard),
       this.getNameComponents(vCard),
+      ...this.getNicknames(vCard),
       ...this.getPhotos(vCard),
       ...this.getAddresses(vCard),
       ...this.getPhones(vCard),
@@ -80,6 +81,13 @@ export class Formatter {
     if(components.every(c => c === '')) return '';
     let result = components.reduce((accumulator, current, index) => accumulator + current + (index !== 4 ? ';' : ''), '');
     return 'N:' + result;
+  }
+
+  /**
+   * Adds the NICKNAME componeents entry. This is optional.
+   */
+  private getNicknames(vCard: IVCard): string[] {
+    return this.getSingleValuedProperty(vCard.nicknames, 'NICKNAME');
   }
 
   /**

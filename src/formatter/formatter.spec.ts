@@ -31,6 +31,28 @@ describe('Formatter', () => {
                                       'END:VCARD');
   });
 
+  it('formats a VCard with both fullName and nickname components', () => {
+    let sut = new Formatter();
+    let vcard: any = new VCard({
+      name: {
+        fullNames: ['John K. Doe'],
+        firstNames: ['John'],
+        middleNames: ['K.', 'M.'],
+        lastNames: ['Doe', 'Smith'],
+        honorificsPre: ['Dr.'],
+        honorificsSuf: ['Esq.']
+      },
+      nicknames: [{value: 'Jonny'}]
+    });
+
+    expect(sut.format(vcard.toJSON())).toEqual('BEGIN:VCARD\r\n' +
+                                      'VERSION:4.0\r\n' +
+                                      'FN:John K. Doe\r\n' +
+                                      'N:Doe,Smith;John;K.,M.;Dr.;Esq.\r\n' +
+                                      'NICKNAME:Jonny\r\n' +
+                                      'END:VCARD');
+  })
+
   it('formats a VCard with fullName from first name components if not provided', () => {
     let sut = new Formatter();
     let vcard: any = new VCard({

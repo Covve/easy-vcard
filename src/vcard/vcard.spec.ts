@@ -75,6 +75,14 @@ describe('VCard', () => {
       expect(name.honorificsSuf![0]).toEqual('Esq.');
     });
 
+    it('adds a nickname', () => {
+      let sut = new VCard();
+      sut.addNickname('Jonny');
+      const nicknames = sut.toJSON().nicknames || [];
+      expect(nicknames.length).toEqual(1);
+      expect(nicknames[0].value).toEqual('Jonny');
+    });
+
     it('adds a photo', () => {
       let sut: any = new VCard();
       sut.addPhoto('http://www.example.com/pub/photos/jqpublic.gif');
