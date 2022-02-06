@@ -77,7 +77,7 @@ describe('VCard', () => {
 
     it('adds a nickname', () => {
       let sut = new VCard();
-      sut.addNickname('Jonny');
+      sut.addNickname('Jonny', );
       const nicknames = sut.toJSON().nicknames || [];
       expect(nicknames.length).toEqual(1);
       expect(nicknames[0].value).toEqual('Jonny');
