@@ -50,6 +50,7 @@ export interface IMultiValueProperty {
 
 export interface IVCard {
   name: IName;
+  nicknames?: ISingleValueProperty[];
   photos?: ISingleValueProperty[];
   addresses?: IAddress[];
   phones?: ISingleValueProperty[];
@@ -67,6 +68,7 @@ const formatter = new Formatter();
 
 export class VCard {
   private _name: IName = {};
+  private _nicknames: ISingleValueProperty[] = [];
   private _photos: ISingleValueProperty[] = [];
   private _addresses: IAddress[] = [];
   private _phones: ISingleValueProperty[] = [];
@@ -83,6 +85,7 @@ export class VCard {
     if (!data) return;
     data = cloneDeep(data);
     this._name = data.name ?? {};
+    this._nicknames = data.nicknames ?? [];
     this._photos = data.photos ?? []
     this._addresses = data.addresses ?? [];
     this._phones = data.phones ?? [];
@@ -99,6 +102,7 @@ export class VCard {
   public toJSON(): IVCard {
     return cloneDeep({
       name: this._name,
+      nicknames: this._nicknames,
       photos: this._photos,
       addresses: this._addresses,
       phones: this._phones,
@@ -155,6 +159,12 @@ export class VCard {
   public setFullName(fullname: string): VCard {
     this._name.fullNames = this._name.fullNames || [];
     this._name.fullNames.push(fullname);
+    return this;
+  }
+
+  public addNickname(nickname: string, params: IParams): VCard {
+    this._nicknames = this._nicknames || [];
+    this._nicknames.push({ value: nickname, params });
     return this;
   }
 
