@@ -17,6 +17,7 @@ Examples are written with Typescript in mind but you should be able to use it in
     .addLastName('Doe')
     .addLastName('Smith')
     .addPrefixName('Dr.')
+    .addNickname('Jonny')
     .addPhone('+1 1221112', { pref: '1', type: 'home' })
     .addEmail('jdoe@jdoecomp.co')
     .addTitle('Senior Engineer')
@@ -29,11 +30,12 @@ Examples are written with Typescript in mind but you should be able to use it in
   \\  VERSION:4.0
   \\  FN:Johnny D. Doe-Smith
   \\  N:Doe,Smith;John;;Dr.;
+  \\  NICKNAME:Jonny
   \\  TEL;PREF=1;TYPE=home:+1 1221112
   \\  EMAIL:jdoe@jdoecomp.co
   \\  TITLE:Senior Engineer
   \\  ORG:Jdoecomp co.;North Division
-  \\  END:VCARD"
+  \\  END:VCARD
   \\
   \\ which you can save to a filesystem as .vcf or encode it in a barcode or whatever
 
@@ -54,6 +56,10 @@ Set the FN property of the vcard. This is mandatory and unique. If it doesn't ex
 ### `addPrefixName(pre: string): VCard`
 ### `addSuffixName(suf: string): VCard`
 Add a first name, middle name, last name, honorific prefix or honorific suffix respectively in the N property. The N property is unique if it exists.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+### `addNickname(nickname: string, params?: IParams): VCard`
+Add a nickname to a NICKNAME property.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 ### `addPhoto(uri: string, params?: IParams): VCard`
@@ -121,7 +127,7 @@ Care should be taken using this as the card might not be readable by 3.0 or olde
 
 The following vCard properties are not yet included but might be in the future.
 ```
-SOURCE, KIND, XML, NICKNAME, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
+SOURCE, KIND, XML, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
 LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, KEY, FBURL, CALADRURI, CALURI
 ```
 ## Contribute

@@ -162,7 +162,7 @@ export class VCard {
     return this;
   }
 
-  public addNickname(nickname: string, params: IParams): VCard {
+  public addNickname(nickname: string, params?: IParams): VCard {
     this._nicknames = this._nicknames || [];
     this._nicknames.push({ value: nickname, params });
     return this;

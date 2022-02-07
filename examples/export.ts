@@ -1,6 +1,8 @@
 /**
  * Export a .vcard or .vcf to a location for testing purposes.
  * Edit fields as appropriate.
+ *
+ * Run through package.json as 'npm run export'
  */
 
 import { writeFile } from "fs";
@@ -19,6 +21,7 @@ vcard
   .setUID('urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6')
   .setRevision('1')
   .addNotes('Jdoe\'s personal notes')
+  .addNickname('Jonny')
   .addPhone('0-123456', { type: 'home', value: 'text'})
   .addPhone('tel:123-456-789', { type: 'work', pref: '1', value: 'uri' })
   .addTitle('Chief support officer')
