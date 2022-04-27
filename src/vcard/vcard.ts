@@ -1,6 +1,6 @@
-import { Formatter } from '../formatter/formatter';
-import isEmpty = require('lodash.isempty');
-import cloneDeep = require('lodash.clonedeep');
+import { Formatter } from "../formatter/formatter";
+import isEmpty = require("lodash.isempty");
+import cloneDeep = require("lodash.clonedeep");
 
 export interface IParams {
   label?: string;
@@ -15,6 +15,7 @@ export interface IParams {
   sortAs?: string;
   geo?: string;
   timezone?: string;
+  encoding?: string;
 }
 
 export interface IName {
@@ -86,7 +87,7 @@ export class VCard {
     data = cloneDeep(data);
     this._name = data.name ?? {};
     this._nicknames = data.nicknames ?? [];
-    this._photos = data.photos ?? []
+    this._photos = data.photos ?? [];
     this._addresses = data.addresses ?? [];
     this._phones = data.phones ?? [];
     this._emails = data.emails ?? [];
@@ -113,8 +114,8 @@ export class VCard {
       notes: this._notes,
       revision: this._revision,
       uid: this._uid,
-      url: this._url
-    })
+      url: this._url,
+    });
   }
 
   public toVcard(forceV3 = false): string {
@@ -168,17 +169,22 @@ export class VCard {
     return this;
   }
 
-  public addPhoto(uri: string, params?: IParams): VCard {
-    this._photos.push({ value: uri, params });
+  public addPhoto(data: string, params?: IParams): VCard {
+    this._photos.push({ value: data, params });
     return this;
   }
 
-  public addAddress(street: string, locality: string, region: string,
-                    postCode: string, country: string, params?: IParams): VCard {
+  public addAddress(
+    street: string,
+    locality: string,
+    region: string,
+    postCode: string,
+    country: string,
+    params?: IParams
+  ): VCard {
     this._addresses = this._addresses || [];
     const address = { street, locality, region, postCode, country, params };
-    if (!isEmpty(address))
-      this._addresses.push(address);
+    if (!isEmpty(address)) this._addresses.push(address);
     return this;
   }
 
@@ -206,12 +212,19 @@ export class VCard {
     return this;
   }
 
-  public addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard {
-    let values = organizationUnits && organizationUnits.length ? organizationUnits.slice() : [];
+  public addOrganization(
+    organization: string,
+    organizationUnits: string[],
+    params?: IParams
+  ): VCard {
+    let values =
+      organizationUnits && organizationUnits.length
+        ? organizationUnits.slice()
+        : [];
     values.splice(0, 0, organization);
 
     this._organizations = this._organizations || [];
-    this._organizations.push({ values , params });
+    this._organizations.push({ values, params });
     return this;
   }
 
