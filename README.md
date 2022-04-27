@@ -45,91 +45,113 @@ Examples are written with Typescript in mind but you should be able to use it in
 
 _Note: IParams refers to a javascript object containing parameters used in certain vCard properties. Some methods support this, some don't. Refer to the RFC aforementioned or source/examples of this project for more details._
 
-
 ### `setFullName(fullName: string)`
+
 Set the FN property of the vcard. This is mandatory and unique. If it doesn't exist, one will be created from name components from the N property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
+
 ### `addFirstName(firstName: string): VCard`
+
 ### `addMiddleName(middleName: string): VCard`
+
 ### `addLastName(lastName: string): VCard`
+
 ### `addPrefixName(pre: string): VCard`
+
 ### `addSuffixName(suf: string): VCard`
+
 Add a first name, middle name, last name, honorific prefix or honorific suffix respectively in the N property. The N property is unique if it exists.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
+
 ### `addNickname(nickname: string, params?: IParams): VCard`
+
 Add a nickname to a NICKNAME property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
-### `addPhoto(uri: string, params?: IParams): VCard`
-Add a photo to a PHOTO property. `uri` can be either a link to a site where the photo is hosted or a base64 data representation.
+---
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+### `addPhoto(data: string, params?: IParams): VCard`
+
+Add a photo to a PHOTO property. `data` can be either a link to a site where the photo is hosted or a base64 data representation.
+
+---
 
 ### `addAddress(street: string, locality: string, region: string, postCode: string, country: string, params?: IParams): VCard`
+
 Add an address as an ADR property. Fields not available should be null or undefined.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addPhone(number: string, params?: IParams): VCard`
+
 Add a phone number to a TEL property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addEmail(email: string, params?: IParams): VCard`
+
 Add an email to an EMAIL property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addTitle(title: string, params?: IParams): VCard`
+
 Add a title in the list of the TITLE property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addRole(role: string, params?: IParams): VCard`
+
 Add a role in the list of the ROLE property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard`
+
 Add an organization to an ORG property. Organization refers to the main name of the company and organizationUnits to second or more unit names.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addNotes(notes: string, params?: IParams): VCard`
+
 Add a notes entry in a NOTE property.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `addUrl(url: string, params?: IParams): VCard`
+
 Add a url entry in a URL property
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `setRevision(rev: string, params?: IParams): VCard`
+
 Set the revision for this vcard.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `setUID(uid: string, params?: IParams): VCard`
+
 Set the user id for this vcard.
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### `toString(forceV3 = false): string`
+
 Takes a VCard object as created above and formats it into a string. Note that a forceV3 argument is included, which if true, sets the VERSION property to 3.0 .
 This doesn't mean that this plugin supports 3.0 vcards or earlier, it's just a workaround to get your simple vcards read by older parsers found in various devices.
 Care should be taken using this as the card might not be readable by 3.0 or older parsers.
 
-
 ## Not yet supported
 
 The following vCard properties are not yet included but might be in the future.
+
 ```
 SOURCE, KIND, XML, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
 LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, KEY, FBURL, CALADRURI, CALURI
 ```
+
 ## Contribute
 
 Feel free to submit PRs or open issues with improvements or bug fixes.
