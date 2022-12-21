@@ -237,8 +237,8 @@ export class Formatter {
   private e(s: string | undefined): string {
     if (!s) return "";
     const escapedBackslashes = s.split("\\").join("\\\\");
-    const escapedCommas = escapedBackslashes.split(",").join(",");
-    const escapedSemicolons = escapedCommas.split(";").join(";");
+    const escapedCommas = escapedBackslashes.split(",").join("\\,");
+    const escapedSemicolons = escapedCommas.split(";").join("\\;");
     const escapedNewlines = escapedSemicolons.split("\n").join("\\n");
     return escapedNewlines;
   }
