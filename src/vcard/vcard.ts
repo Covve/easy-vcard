@@ -127,49 +127,49 @@ export class VCard {
   }
 
   /** Helper methods for editing after initialization **/
-  public addFirstName(firstName: string): VCard {
-    this._name.firstNames = this._name.firstNames || [];
+  public addFirstName(firstName: string): this {
+    this._name.firstNames = this._name.firstNames ?? [];
     this._name.firstNames.push(firstName);
     return this;
   }
 
-  public addMiddleName(middleName: string): VCard {
-    this._name.middleNames = this._name.middleNames || [];
+  public addMiddleName(middleName: string): this {
+    this._name.middleNames = this._name.middleNames ?? [];
     this._name.middleNames.push(middleName);
     return this;
   }
 
-  public addLastName(lastName: string): VCard {
-    this._name.lastNames = this._name.lastNames || [];
+  public addLastName(lastName: string): this {
+    this._name.lastNames = this._name.lastNames ?? [];
     this._name.lastNames.push(lastName);
     return this;
   }
 
-  public addPrefixName(pre: string): VCard {
-    this._name.honorificsPre = this._name.honorificsPre || [];
+  public addPrefixName(pre: string): this {
+    this._name.honorificsPre = this._name.honorificsPre ?? [];
     this._name.honorificsPre.push(pre);
     return this;
   }
 
-  public addSuffixName(suf: string): VCard {
-    this._name.honorificsSuf = this._name.honorificsSuf || [];
+  public addSuffixName(suf: string): this {
+    this._name.honorificsSuf = this._name.honorificsSuf ?? [];
     this._name.honorificsSuf.push(suf);
     return this;
   }
 
-  public setFullName(fullname: string): VCard {
-    this._name.fullNames = this._name.fullNames || [];
+  public setFullName(fullname: string): this {
+    this._name.fullNames = this._name.fullNames ?? [];
     this._name.fullNames.push(fullname);
     return this;
   }
 
-  public addNickname(nickname: string, params?: IParams): VCard {
+  public addNickname(nickname: string, params?: IParams): this {
     this._nicknames = this._nicknames || [];
     this._nicknames.push({ value: nickname, params });
     return this;
   }
 
-  public addPhoto(data: string, params?: IParams): VCard {
+  public addPhoto(data: string, params?: IParams): this {
     this._photos.push({ value: data, params });
     return this;
   }
@@ -181,32 +181,32 @@ export class VCard {
     postCode: string,
     country: string,
     params?: IParams
-  ): VCard {
+  ): this {
     this._addresses = this._addresses || [];
     const address = { street, locality, region, postCode, country, params };
     if (!isEmpty(address)) this._addresses.push(address);
     return this;
   }
 
-  public addPhone(number: string, params?: IParams): VCard {
+  public addPhone(number: string, params?: IParams): this {
     this._phones = this._phones || [];
     this._phones.push({ value: number, params });
     return this;
   }
 
-  public addEmail(email: string, params?: IParams): VCard {
+  public addEmail(email: string, params?: IParams): this {
     this._emails = this._emails || [];
     this._emails.push({ value: email, params });
     return this;
   }
 
-  public addTitle(title: string, params?: IParams): VCard {
+  public addTitle(title: string, params?: IParams): this {
     this._titles = this._titles || [];
     this._titles.push({ value: title, params });
     return this;
   }
 
-  public addRole(role: string, params?: IParams): VCard {
+  public addRole(role: string, params?: IParams): this {
     this._roles = this._roles || [];
     this._roles.push({ value: role, params });
     return this;
@@ -214,11 +214,11 @@ export class VCard {
 
   public addOrganization(
     organization: string,
-    organizationUnits: string[],
+    organizationUnits?: string[],
     params?: IParams
-  ): VCard {
-    let values =
-      organizationUnits && organizationUnits.length
+  ): this {
+    const values =
+      organizationUnits?.length
         ? organizationUnits.slice()
         : [];
     values.splice(0, 0, organization);
@@ -228,24 +228,24 @@ export class VCard {
     return this;
   }
 
-  public addNotes(notes: string, params?: IParams): VCard {
+  public addNotes(notes: string, params?: IParams): this {
     this._notes = this._notes || [];
     this._notes.push({ value: notes, params });
     return this;
   }
 
-  public addUrl(url: string, params?: IParams): VCard {
+  public addUrl(url: string, params?: IParams): this {
     this._url = this._url || [];
     this._url.push({ value: url, params });
     return this;
   }
 
-  public setRevision(rev: string, params?: IParams): VCard {
+  public setRevision(rev: string, params?: IParams): this {
     this._revision = { value: rev, params };
     return this;
   }
 
-  public setUID(uid: string, params?: IParams): VCard {
+  public setUID(uid: string, params?: IParams): this {
     this._uid = { value: uid, params };
     return this;
   }

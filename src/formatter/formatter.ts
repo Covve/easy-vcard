@@ -49,12 +49,12 @@ export class Formatter {
    * exist in a VCard.
    */
   private getFullName(vCard: IVCard): string {
-    let name = vCard.name;
+    const name = vCard.name;
     if (!name || this.checkIfNameExists(name))
       throw new Error(
         "tried to format a vcard that had no name entry while name is mandatory"
       );
-    if (name.fullNames && name.fullNames.length)
+    if (name.fullNames?.length)
       return (
         "FN" +
         this.getFormattedParams(name.params) +
@@ -91,7 +91,7 @@ export class Formatter {
    * Adds the N - name components entry. This is optional.
    */
   private getNameComponents(vCard: IVCard): string {
-    let name = vCard.name;
+    const name = vCard.name;
     if (!name) return "";
     const components = [
       this.concatWith(name.lastNames),
@@ -101,7 +101,7 @@ export class Formatter {
       this.concatWith(name.honorificsSuf),
     ];
     if (components.every((c) => c === "")) return "";
-    let result = components.reduce(
+    const result = components.reduce(
       (accumulator, current, index) =>
         accumulator + current + (index !== 4 ? ";" : ""),
       ""
@@ -127,8 +127,8 @@ export class Formatter {
    * Adds the ADR - address entry. Creates one for each address in vCard.phones field.
    */
   private getAddresses(vCard: IVCard): string[] {
-    let addresses = vCard.addresses;
-    if (!addresses || !addresses.length) return [];
+    const addresses = vCard.addresses;
+    if (!addresses?.length) return [];
     return addresses
       .filter((addr) => !!addr && !isEmpty(addr))
       .map(
@@ -181,15 +181,15 @@ export class Formatter {
    */
   private getOrganizations(vCard: IVCard): string[] {
     const orgs = vCard.organizations;
-    if (!orgs || !orgs.length) return [];
+    if (!orgs?.length) return [];
     return orgs
       .filter((org) => !!org && !!org.values && !!org.values.length)
       .map(
-        (org: any) =>
+        (org) =>
           "ORG" +
           this.getFormattedParams(org.params) +
           ":" +
-          org.values.map((v: string) => this.e(v)).join(";")
+          org.values?.map((v: string) => this.e(v)).join(";")
       );
   }
 
@@ -205,7 +205,7 @@ export class Formatter {
    */
   private getRevision(vCard: IVCard): string {
     const rev = vCard.revision;
-    if (!rev || !rev.value) return "";
+    if (!rev?.value) return "";
     return (
       "REV" + this.getFormattedParams(rev.params) + ":" + this.e(rev.value)
     );
@@ -216,7 +216,7 @@ export class Formatter {
    */
   private getUID(vCard: IVCard): string {
     const uid = vCard.uid;
-    if (!uid || !uid.value) return "";
+    if (!uid?.value) return "";
     return (
       "UID" + this.getFormattedParams(uid.params) + ":" + this.e(uid.value)
     );
@@ -250,8 +250,8 @@ export class Formatter {
    * @param separator - separator to concat with
    * @return concatenated list
    */
-  private concatWith(list: any[] | undefined, separator = ","): string {
-    if (!list || !list.length) return "";
+  private concatWith(list: string[] | undefined, separator = ","): string {
+    if (!list?.length) return "";
     return list.reduce(
       (accumulator, current) =>
         accumulator + (accumulator ? separator : "") + this.e(current),
@@ -338,7 +338,7 @@ export class Formatter {
     entities: ISingleValueProperty[] | undefined,
     propertyIdentifier: string
   ): string[] {
-    if (!entities || !entities.length) return [];
+    if (!entities?.length) return [];
     return entities
       .filter((entity) => !!entity && entity.value)
       .map(
