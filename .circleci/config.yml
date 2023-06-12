@@ -1,7 +1,8 @@
 defaults: &defaults
+  resource_class: small
   working_directory: ~/easy-vcard
   docker:
-    - image: circleci/node:10.12
+    - image: cimg/node:16.20
 
 version: 2
 jobs:
@@ -16,7 +17,7 @@ jobs:
           command: npm install --unsafe-perm=true --no-save
       - run:
           name: test easy-vcard
-          command: npm run test:circleCI
+          command: npm run test:ci
       - store_test_results:
           path: ~/xapp/test_results
       - run:

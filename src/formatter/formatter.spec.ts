@@ -1,18 +1,18 @@
-import { VCard } from "../vcard/vcard";
+import { IParams, VCard } from "../vcard/vcard";
 import { Formatter } from "./formatter";
 
 describe("Formatter", () => {
   it("prints a VCard with fullName", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({ name: { fullNames: ["John K. Doe"] } });
+    const sut = new Formatter();
+    const vcard = new VCard({ name: { fullNames: ["John K. Doe"] } });
     expect(sut.format(vcard.toJSON())).toEqual(
       "BEGIN:VCARD\r\n" + "VERSION:4.0\r\n" + "FN:John K. Doe\r\n" + "END:VCARD"
     );
   });
 
   it("formats a VCard with both fullName and name components", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John K. Doe"],
         firstNames: ["John"],
@@ -33,8 +33,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with both fullName and nickname components", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John K. Doe"],
         firstNames: ["John"],
@@ -57,8 +57,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with fullName from first name components if not provided", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         firstNames: ["John", "Jack"],
         middleNames: ["K.", "M."],
@@ -77,8 +77,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a base64 photo", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -99,8 +99,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a photo url", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -121,8 +121,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with an address", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -147,8 +147,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with addresses in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -179,8 +179,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a phone", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -202,8 +202,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with phones in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -231,8 +231,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard an email", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -253,9 +253,9 @@ describe("Formatter", () => {
     );
   });
 
-  it("formats a VCard with emails in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+  it('formats a VCard with emails in a more complicated scenario', () => {
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -264,7 +264,7 @@ describe("Formatter", () => {
           value: "jdoe@smithsoni\nan.com",
           params: { type: "work", pref: "1" },
         },
-        { value: "jdo,e2@smith sonian.com", params: <any>{ type: null } },
+        { value: "jdo,e2@smith sonian.com", params: { type: null } as unknown as IParams},
         {},
       ],
     });
@@ -280,8 +280,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a job title", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -298,8 +298,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with titles in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -321,8 +321,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a job role", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -339,8 +339,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with roles in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -362,8 +362,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with an organization", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -380,8 +380,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with roles in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -406,8 +406,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a note entry", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -424,8 +424,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with notes in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -450,8 +450,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a url entry", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -468,8 +468,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with urls in a more complicated scenario", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -491,8 +491,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a revision", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -508,8 +508,8 @@ describe("Formatter", () => {
   });
 
   it("formats a VCard with a uid", () => {
-    let sut = new Formatter();
-    let vcard: any = new VCard({
+    const sut = new Formatter();
+    const vcard = new VCard({
       name: {
         fullNames: ["John"],
       },
@@ -526,8 +526,8 @@ describe("Formatter", () => {
 
   describe("params", () => {
     it("formats all params", () => {
-      let sut = new Formatter();
-      let vcard: any = new VCard({
+      const sut = new Formatter();
+      const vcard = new VCard({
         name: {
           fullNames: ["John"],
           params: {
@@ -563,8 +563,8 @@ describe("Formatter", () => {
     });
 
     it("sanitizes params", () => {
-      let sut = new Formatter();
-      let vcard: any = new VCard({
+      const sut = new Formatter();
+      const vcard = new VCard({
         name: {
           fullNames: ["John"],
           params: {
@@ -601,8 +601,8 @@ describe("Formatter", () => {
 
     describe("complete examples", () => {
       it("construct a vcard then format it", () => {
-        let sut = new Formatter();
-        let vcard: any = new VCard({
+        const sut = new Formatter();
+        const vcard = new VCard({
           name: {
             firstNames: ["John"],
             lastNames: ["Doe", "Foo"],
