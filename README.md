@@ -1,161 +1,188 @@
 # Easy-vcard
 
-Create vcards and format to strings to export in `.vcf` or `.vcard` files. This is an implementation of the version 4.0 vcard in Typescript according to [RFC6350](https://tools.ietf.org/html/rfc6350). This is an early version an many vcard fields or properties might not be supported. Check below for what's included.
+Create vCards and format them to strings to export as `.vcf` or `.vcard` files. Implementation of vCard 4.0 in TypeScript, per [RFC6350](https://tools.ietf.org/html/rfc6350). Many vCard properties are not yet supported — see the "Not yet supported" section at the bottom.
+
+Supports value escaping (RFC6350 §3.4) and content-line folding at 75 octets (§3.2), and falls back to `VERSION:3.0` output on demand for older parsers.
 
 ## Installation
 
-`npm install --save @covve/easy-vcard`
+```
+npm install --save @covve/easy-vcard
+```
+
+Requires Node.js **≥18** (uses the built-in `structuredClone`).
 
 ## Usage
 
-Examples are written with Typescript in mind but you should be able to use it in nodejs projects as well. Below we construct a simple vcard and export it.
+```ts
+import { VCard } from '@covve/easy-vcard';
 
+const vcard = new VCard()
+  .setFullName('Johnny D. Doe-Smith')
+  .addFirstName('John')
+  .addLastName('Doe')
+  .addLastName('Smith')
+  .addPrefixName('Dr.')
+  .addNickname('Jonny')
+  .addPhone('+1 1221112', { pref: '1', type: 'home' })
+  .addEmail('jdoe@jdoecomp.co')
+  .addTitle('Senior Engineer')
+  .addOrganization('Jdoecomp co.', ['North Division']);
+
+const formattedText = vcard.toString();
+// BEGIN:VCARD
+// VERSION:4.0
+// FN:Johnny D. Doe-Smith
+// N:Doe,Smith;John;;Dr.;
+// NICKNAME:Jonny
+// TEL;PREF=1;TYPE=home:+1 1221112
+// EMAIL:jdoe@jdoecomp.co
+// TITLE:Senior Engineer
+// ORG:Jdoecomp co.;North Division
+// END:VCARD
+//
+// (each line is terminated with CRLF, and lines longer than 75 octets
+//  are folded with CRLF + SPACE)
 ```
-  let vcard = new VCard();
-  vcard.setFullName('Johnny D. Doe-Smith')
-    .addFirstName('John')
-    .addLastName('Doe')
-    .addLastName('Smith')
-    .addPrefixName('Dr.')
-    .addNickname('Jonny')
-    .addPhone('+1 1221112', { pref: '1', type: 'home' })
-    .addEmail('jdoe@jdoecomp.co')
-    .addTitle('Senior Engineer')
-    .addOrganization('Jdoecomp co.', ['North Division']);
 
-  let formatter = new Formatter();
-  let formattedText = formatter.format(vcard);
-  \\ This should output the following
-  \\ "BEGIN:VCARD
-  \\  VERSION:4.0
-  \\  FN:Johnny D. Doe-Smith
-  \\  N:Doe,Smith;John;;Dr.;
-  \\  NICKNAME:Jonny
-  \\  TEL;PREF=1;TYPE=home:+1 1221112
-  \\  EMAIL:jdoe@jdoecomp.co
-  \\  TITLE:Senior Engineer
-  \\  ORG:Jdoecomp co.;North Division
-  \\  END:VCARD
-  \\
-  \\ which you can save to a filesystem as .vcf or encode it in a barcode or whatever
+You can also use the `Formatter` directly if you already have an `IVCard` plain object:
 
+```ts
+import { Formatter, VCard } from '@covve/easy-vcard';
+
+const formatter = new Formatter();
+const text = formatter.format(vcard.toJSON());
 ```
+
+## Behavior worth knowing
+
+- **Escaping (§3.4).** Backslash, comma, semicolon, and newline characters in property text values are automatically escaped to `\\`, `\,`, `\;`, and `\n` respectively. You pass raw values; the library handles escaping.
+- **Line folding (§3.2).** Content lines longer than 75 UTF-8 octets are folded with `CRLF` + space. Multibyte characters (CJK, emoji, etc.) are never split mid-codepoint.
+- **`forceV3` flag.** `vcard.toString(true)` or `formatter.format(vcard, true)` emits `VERSION:3.0`. The output still uses 4.0 conventions internally — this is a compatibility shim for parsers that reject the 4.0 version header. Use with care.
 
 ## VCard methods
 
-_Note: IParams refers to a javascript object containing parameters used in certain vCard properties. Some methods support this, some don't. Refer to the RFC aforementioned or source/examples of this project for more details._
+_`IParams` refers to an object containing parameters used on certain vCard properties (`label`, `language`, `value`, `pref`, `altId`, `pid`, `type`, `mediatype`, `calscale`, `sortAs`, `geo`, `timezone`, `encoding`). Not every property supports every parameter — see the RFC for details._
 
-### `setFullName(fullName: string)`
+### `setFullName(fullName: string): VCard`
 
-Set the FN property of the vcard. This is mandatory and unique. If it doesn't exist, one will be created from name components from the N property.
+Sets the `FN` (formatted name) property. This is mandatory in a valid vCard; if no `FN` is set, one is generated from the name components on the `N` property.
 
 ---
 
 ### `addFirstName(firstName: string): VCard`
-
 ### `addMiddleName(middleName: string): VCard`
-
 ### `addLastName(lastName: string): VCard`
-
 ### `addPrefixName(pre: string): VCard`
-
 ### `addSuffixName(suf: string): VCard`
 
-Add a first name, middle name, last name, honorific prefix or honorific suffix respectively in the N property. The N property is unique if it exists.
+Append a first name, middle name, last name, honorific prefix, or honorific suffix to the `N` property.
 
 ---
 
 ### `addNickname(nickname: string, params?: IParams): VCard`
 
-Add a nickname to a NICKNAME property.
+Add an entry to a `NICKNAME` property.
 
 ---
 
 ### `addPhoto(data: string, params?: IParams): VCard`
 
-Add a photo to a PHOTO property. `data` can be either a link to a site where the photo is hosted or a base64 data representation.
+Add a `PHOTO` property. `data` may be a URL or a base64 data URI.
 
 ---
 
-### `addAddress(street: string, locality: string, region: string, postCode: string, country: string, params?: IParams): VCard`
+### `addAddress(street, locality, region, postCode, country, params?: IParams): VCard`
 
-Add an address as an ADR property. Fields not available should be null or undefined.
+Add an `ADR` property. Each component accepts `string | null | undefined` — `null` and `undefined` are normalized to empty strings:
+
+```ts
+vcard.addAddress('123 Main St.', null, undefined, 'AB-123', 'USA', { type: 'home' });
+// → ADR;TYPE=home:;;123 Main St.;;;AB-123;USA
+```
 
 ---
 
 ### `addPhone(number: string, params?: IParams): VCard`
 
-Add a phone number to a TEL property.
+Add an entry to a `TEL` property.
 
 ---
 
 ### `addEmail(email: string, params?: IParams): VCard`
 
-Add an email to an EMAIL property.
+Add an entry to an `EMAIL` property.
 
 ---
 
 ### `addTitle(title: string, params?: IParams): VCard`
 
-Add a title in the list of the TITLE property.
+Add an entry to a `TITLE` property.
 
 ---
 
 ### `addRole(role: string, params?: IParams): VCard`
 
-Add a role in the list of the ROLE property.
+Add an entry to a `ROLE` property.
 
 ---
 
-### `addOrganization(organization: string, organizationUnits: string[], params?: IParams): VCard`
+### `addOrganization(organization: string, organizationUnits?: string[], params?: IParams): VCard`
 
-Add an organization to an ORG property. Organization refers to the main name of the company and organizationUnits to second or more unit names.
+Add an `ORG` property. `organization` is the primary org name and `organizationUnits` contains optional sub-unit names.
 
 ---
 
 ### `addNotes(notes: string, params?: IParams): VCard`
 
-Add a notes entry in a NOTE property.
+Add an entry to a `NOTE` property.
 
 ---
 
 ### `addUrl(url: string, params?: IParams): VCard`
 
-Add a url entry in a URL property
+Add an entry to a `URL` property.
 
 ---
 
 ### `setRevision(rev: string, params?: IParams): VCard`
 
-Set the revision for this vcard.
+Set the `REV` (revision) property.
 
 ---
 
 ### `setUID(uid: string, params?: IParams): VCard`
 
-Set the user id for this vcard.
+Set the `UID` property.
 
 ---
 
 ### `toString(forceV3 = false): string`
+### `toVcard(forceV3 = false): string`
 
-Takes a VCard object as created above and formats it into a string. Note that a forceV3 argument is included, which if true, sets the VERSION property to 3.0 .
-This doesn't mean that this plugin supports 3.0 vcards or earlier, it's just a workaround to get your simple vcards read by older parsers found in various devices.
-Care should be taken using this as the card might not be readable by 3.0 or older parsers.
+Format the vCard to a string. When `forceV3` is `true`, emits `VERSION:3.0` instead of `4.0` — useful for older parsers, but the rest of the output still follows 4.0 conventions, so the result may not be fully valid 3.0.
+
+---
+
+### `toJSON(): IVCard`
+
+Returns a deep clone of the internal vCard state as a plain object, suitable for serialization or passing to `Formatter.format()`.
 
 ## Not yet supported
 
-The following vCard properties are not yet included but might be in the future.
+The following vCard properties are not yet included but may be added in the future.
 
 ```
 SOURCE, KIND, XML, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
 LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, KEY, FBURL, CALADRURI, CALURI
 ```
 
-## Contribute
+Parsing existing vCard strings is out of scope for this library. For parsing, see [`vcard4`](https://www.npmjs.com/package/vcard4) or [`vcf`](https://www.npmjs.com/package/vcf).
 
-Feel free to submit PRs or open issues with improvements or bug fixes.
+## Contributing
 
-## LICENSE
+PRs and issues welcome. See `CHANGELOG.md` for the version history.
+
+## License
 
 MIT
