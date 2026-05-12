@@ -1,3 +1,8 @@
+## `2.1.1`
+
+- Trim the published npm tarball. The package now ships only `dist/`, `README.md`, `CHANGELOG.md`, `LICENCE.txt`, and `package.json` via an explicit `files` allowlist. Test specs and source `.ts` files are no longer included. Tarball size dropped from ~41 kB to ~13 kB.
+- Split `tsconfig.build.json` from `tsconfig.json` so type-aware lint still sees test files while `tsc` skips them.
+
 ## `2.1.0`
 
 - `addAddress` now accepts `null` or `undefined` for any of the five component fields, normalizing them to empty strings internally. Matches the README wording. Closes #30.
