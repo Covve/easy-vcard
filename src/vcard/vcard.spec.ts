@@ -208,6 +208,78 @@ describe('VCard', () => {
       const url = sut.toJSON().url ?? [];
       expect(url.length).toEqual(1);
       expect(url[0].value).toEqual('https://www.test.com');
-    })
+    });
+
+    it('adds an organization with an explicit empty units array', () => {
+      const sut = new VCard();
+      sut.addOrganization('Covve', []);
+      const organizations = sut.toJSON().organizations ?? [];
+      expect(organizations.length).toEqual(1);
+      expect(organizations[0].values).toEqual(['Covve']);
+    });
+
+    it('appends to fullNames when setFullName is called twice', () => {
+      const sut = new VCard();
+      sut.setFullName('John').setFullName('Johnny');
+      expect(sut.toJSON().name.fullNames).toEqual(['John', 'Johnny']);
+    });
+
+    it('keeps params when setting a revision', () => {
+      const sut = new VCard();
+      sut.setRevision('1', { language: 'en' });
+      expect(sut.toJSON().revision?.params?.language).toEqual('en');
+    });
+
+    it('keeps params when setting a UID', () => {
+      const sut = new VCard();
+      sut.setUID('uid-1', { type: 'work' });
+      expect(sut.toJSON().uid?.params?.type).toEqual('work');
+    });
+
+    it('pushes an address even when all fields are empty', () => {
+      const sut = new VCard();
+      sut.addAddress('', '', '', '', '');
+      const addresses = sut.toJSON().addresses ?? [];
+      expect(addresses.length).toEqual(1);
+    });
+  });
+
+  describe('isolation', () => {
+    it('does not mutate source data after construction', () => {
+      const data = {
+        name: { firstNames: ['John'] },
+        emails: [{ value: 'john@example.com' }],
+      };
+      const sut = new VCard(data);
+      data.name.firstNames.push('Jack');
+      data.emails.push({ value: 'jack@example.com' });
+      expect(sut.toJSON().name.firstNames).toEqual(['John']);
+      expect(sut.toJSON().emails?.length).toEqual(1);
+    });
+
+    it('returns a fresh JSON copy on each toJSON() call', () => {
+      const sut = new VCard();
+      sut.addEmail('john@example.com');
+      const first = sut.toJSON();
+      first.emails?.push({ value: 'second@example.com' });
+      const second = sut.toJSON();
+      expect(second.emails?.length).toEqual(1);
+    });
+  });
+
+  describe('serialization', () => {
+    it('toString returns the same string as toVcard', () => {
+      const sut = new VCard();
+      sut.setFullName('John Doe').addEmail('john@example.com');
+      expect(sut.toString()).toEqual(sut.toVcard());
+    });
+
+    it('toString(true) emits a VERSION:3.0 vcard', () => {
+      const sut = new VCard();
+      sut.setFullName('John Doe');
+      const output = sut.toString(true);
+      expect(output).toContain('VERSION:3.0');
+      expect(output).not.toContain('VERSION:4.0');
+    });
   });
 });
