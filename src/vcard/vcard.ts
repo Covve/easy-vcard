@@ -1,6 +1,4 @@
 import { Formatter } from "../formatter/formatter";
-import isEmpty = require("lodash.isempty");
-import cloneDeep = require("lodash.clonedeep");
 
 export interface IParams {
   label?: string;
@@ -84,7 +82,7 @@ export class VCard {
 
   constructor(data?: Partial<IVCard>) {
     if (!data) return;
-    data = cloneDeep(data);
+    data = structuredClone(data);
     this._name = data.name ?? {};
     this._nicknames = data.nicknames ?? [];
     this._photos = data.photos ?? [];
@@ -101,7 +99,7 @@ export class VCard {
   }
 
   public toJSON(): IVCard {
-    return cloneDeep({
+    return structuredClone({
       name: this._name,
       nicknames: this._nicknames,
       photos: this._photos,
@@ -183,8 +181,7 @@ export class VCard {
     params?: IParams
   ): this {
     this._addresses = this._addresses || [];
-    const address = { street, locality, region, postCode, country, params };
-    if (!isEmpty(address)) this._addresses.push(address);
+    this._addresses.push({ street, locality, region, postCode, country, params });
     return this;
   }
 

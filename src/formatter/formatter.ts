@@ -1,13 +1,11 @@
-// TODO: line folding
-
-import { IName, IParams, ISingleValueProperty, IVCard } from "../vcard/vcard";
-import isEmpty = require("lodash.isempty");
+import { IAddress, IName, IParams, ISingleValueProperty, IVCard } from "../vcard/vcard";
 
 const NEWLINE = "\r\n";
 const BEGIN_TOKEN = "BEGIN:VCARD";
 const VERSION_TOKEN_V4 = "VERSION:4.0";
 const VERSION_TOKEN_V3 = "VERSION:3.0";
 const END_TOKEN = "END:VCARD";
+const MAX_LINE_OCTETS = 75;
 
 export class Formatter {
   /**
@@ -37,11 +35,9 @@ export class Formatter {
       END_TOKEN,
     ];
     return lines
-      .reduce(
-        (accumulator, current) => accumulator + current + (current && NEWLINE),
-        ""
-      )
-      .trim();
+      .filter((line) => !!line)
+      .map((line) => this.fold(line))
+      .join(NEWLINE);
   }
 
   /**
@@ -61,30 +57,14 @@ export class Formatter {
         ":" +
         this.e(name.fullNames[0])
       );
-    else if (name) {
-      // construct from fields
-      // TODO: rewrite this it looks terrible
-      return (
-        "FN:" +
-        this.e(
-          (name.honorificsPre && !!name.honorificsPre.length
-            ? name.honorificsPre[0] + " "
-            : "") +
-            (name.firstNames && !!name.firstNames.length
-              ? name.firstNames[0] + " "
-              : "") +
-            (name.middleNames && !!name.middleNames.length
-              ? name.middleNames[0] + " "
-              : "") +
-            (name.lastNames && !!name.lastNames.length
-              ? name.lastNames[0] + " "
-              : "") +
-            (name.honorificsSuf && !!name.honorificsSuf.length
-              ? name.honorificsSuf[0] + " "
-              : "")
-        ).trim()
-      );
-    } else return "";
+    const segments = [
+      name.honorificsPre?.[0],
+      name.firstNames?.[0],
+      name.middleNames?.[0],
+      name.lastNames?.[0],
+      name.honorificsSuf?.[0],
+    ].filter((s): s is string => !!s);
+    return "FN:" + this.e(segments.join(" "));
   }
 
   /**
@@ -101,16 +81,11 @@ export class Formatter {
       this.concatWith(name.honorificsSuf),
     ];
     if (components.every((c) => c === "")) return "";
-    const result = components.reduce(
-      (accumulator, current, index) =>
-        accumulator + current + (index !== 4 ? ";" : ""),
-      ""
-    );
-    return "N:" + result;
+    return "N:" + components.join(";");
   }
 
   /**
-   * Adds the NICKNAME componeents entry. This is optional.
+   * Adds the NICKNAME components entry. This is optional.
    */
   private getNicknames(vCard: IVCard): string[] {
     return this.getSingleValuedProperty(vCard.nicknames, "NICKNAME");
@@ -124,13 +99,13 @@ export class Formatter {
   }
 
   /**
-   * Adds the ADR - address entry. Creates one for each address in vCard.phones field.
+   * Adds the ADR - address entry. Creates one for each address in vCard.addresses field.
    */
   private getAddresses(vCard: IVCard): string[] {
     const addresses = vCard.addresses;
     if (!addresses?.length) return [];
     return addresses
-      .filter((addr) => !!addr && !isEmpty(addr))
+      .filter((addr) => !!addr && this.hasAddressContent(addr))
       .map(
         (addr) =>
           "ADR" +
@@ -230,17 +205,17 @@ export class Formatter {
   }
 
   /**
-   * Escape non valid characters according to RFC.
-   * Those characters are comma, semicolon, backslash and newlines.
-   *
+   * Escape characters in property text values per RFC6350 §3.4:
+   * backslash, comma, semicolon, and newlines.
    */
   private e(s: string | undefined): string {
     if (!s) return "";
-    const escapedBackslashes = s.split("\\").join("\\\\");
-    const escapedCommas = escapedBackslashes.split(",").join(",");
-    const escapedSemicolons = escapedCommas.split(";").join(";");
-    const escapedNewlines = escapedSemicolons.split("\n").join("\\n");
-    return escapedNewlines;
+    return s
+      .split("\\").join("\\\\")
+      .split(",").join("\\,")
+      .split(";").join("\\;")
+      .split("\r\n").join("\\n")
+      .split("\n").join("\\n");
   }
 
   /**
@@ -252,11 +227,7 @@ export class Formatter {
    */
   private concatWith(list: string[] | undefined, separator = ","): string {
     if (!list?.length) return "";
-    return list.reduce(
-      (accumulator, current) =>
-        accumulator + (accumulator ? separator : "") + this.e(current),
-      ""
-    );
+    return list.map((item) => this.e(item)).join(separator);
   }
 
   /**
@@ -268,49 +239,25 @@ export class Formatter {
    */
   private getFormattedParams(params: IParams | undefined): string {
     if (!params) return "";
-    let result = "";
-
-    if (params.label) {
-      result += `;LABEL=${this.sanitizeParamValue(params.label)}`;
-    }
-    if (params.language) {
-      result += `;LANGUAGE=${this.sanitizeParamValue(params.language)}`;
-    }
-    if (params.value) {
-      result += `;VALUE=${this.sanitizeParamValue(params.value)}`;
-    }
-    if (params.pref) {
-      result += `;PREF=${this.sanitizeParamValue(params.pref)}`;
-    }
-    if (params.altId) {
-      result += `;ALTID=${this.sanitizeParamValue(params.altId)}`;
-    }
-    if (params.pid) {
-      result += `;PID=${this.sanitizeParamValue(params.pid)}`;
-    }
-    if (params.type) {
-      result += `;TYPE=${this.sanitizeParamValue(params.type)}`;
-    }
-    if (params.mediatype) {
-      result += `;MEDIATYPE=${this.sanitizeParamValue(params.mediatype)}`;
-    }
-    if (params.calscale) {
-      result += `;CALSCALE=${this.sanitizeParamValue(params.calscale)}`;
-    }
-    if (params.sortAs) {
-      result += `;SORT-AS=${this.sanitizeParamValue(params.sortAs)}`;
-    }
-    if (params.geo) {
-      result += `;GEO=${this.sanitizeParamValue(params.geo)}`;
-    }
-    if (params.timezone) {
-      result += `;TZ=${this.sanitizeParamValue(params.timezone)}`;
-    }
-    if (params.encoding) {
-      result += `;ENCODING=${this.sanitizeParamValue(params.encoding)}`;
-    }
-
-    return result;
+    const mappings: Array<[keyof IParams, string]> = [
+      ["label", "LABEL"],
+      ["language", "LANGUAGE"],
+      ["value", "VALUE"],
+      ["pref", "PREF"],
+      ["altId", "ALTID"],
+      ["pid", "PID"],
+      ["type", "TYPE"],
+      ["mediatype", "MEDIATYPE"],
+      ["calscale", "CALSCALE"],
+      ["sortAs", "SORT-AS"],
+      ["geo", "GEO"],
+      ["timezone", "TZ"],
+      ["encoding", "ENCODING"],
+    ];
+    return mappings
+      .filter(([key]) => !!params[key])
+      .map(([key, token]) => `;${token}=${this.sanitizeParamValue(params[key] as string)}`)
+      .join("");
   }
 
   /**
@@ -318,7 +265,7 @@ export class Formatter {
    *
    * @param value - parameter value to sanitize
    */
-  private sanitizeParamValue(value: string) {
+  private sanitizeParamValue(value: string): string {
     if (!value) return "";
     // remove all double quotes
     let result = value.split('"').join("");
@@ -340,7 +287,7 @@ export class Formatter {
   ): string[] {
     if (!entities?.length) return [];
     return entities
-      .filter((entity) => !!entity && entity.value)
+      .filter((entity) => !!entity && !!entity.value)
       .map(
         (entity) =>
           propertyIdentifier +
@@ -351,14 +298,61 @@ export class Formatter {
   }
 
   private checkIfNameExists(name: IName): boolean {
+    if (!name) return true;
     return (
-      !name ||
-      (isEmpty(name.fullNames) &&
-        isEmpty(name.firstNames) &&
-        isEmpty(name.middleNames) &&
-        isEmpty(name.lastNames) &&
-        isEmpty(name.honorificsPre) &&
-        isEmpty(name.honorificsSuf))
+      !name.fullNames?.length &&
+      !name.firstNames?.length &&
+      !name.middleNames?.length &&
+      !name.lastNames?.length &&
+      !name.honorificsPre?.length &&
+      !name.honorificsSuf?.length
     );
+  }
+
+  private hasAddressContent(addr: IAddress): boolean {
+    return !!(
+      addr.street ||
+      addr.locality ||
+      addr.region ||
+      addr.postCode ||
+      addr.country
+    );
+  }
+
+  /**
+   * Fold a content line per RFC6350 §3.2: lines longer than 75 octets are
+   * split with CRLF followed by a single SPACE. Splits are performed on
+   * codepoint boundaries so multibyte UTF-8 characters are not torn.
+   */
+  private fold(line: string): string {
+    if (!line) return line;
+    const segments: string[] = [];
+    let segmentBytes = 0;
+    let segmentStart = 0;
+    let i = 0;
+    while (i < line.length) {
+      const codePoint = line.codePointAt(i);
+      if (codePoint === undefined) break;
+      const charLen = codePoint > 0xffff ? 2 : 1;
+      const byteLen = this.utf8ByteLength(codePoint);
+      if (segmentBytes + byteLen > MAX_LINE_OCTETS && segmentBytes > 0) {
+        segments.push(line.slice(segmentStart, i));
+        segmentStart = i;
+        segmentBytes = 0;
+      }
+      segmentBytes += byteLen;
+      i += charLen;
+    }
+    if (segmentStart < line.length) {
+      segments.push(line.slice(segmentStart));
+    }
+    return segments.join(NEWLINE + " ");
+  }
+
+  private utf8ByteLength(codePoint: number): number {
+    if (codePoint < 0x80) return 1;
+    if (codePoint < 0x800) return 2;
+    if (codePoint < 0x10000) return 3;
+    return 4;
   }
 }

@@ -2,7 +2,7 @@ defaults: &defaults
   resource_class: small
   working_directory: ~/easy-vcard
   docker:
-    - image: cimg/node:16.20
+    - image: cimg/node:22.14
 
 version: 2
 jobs:

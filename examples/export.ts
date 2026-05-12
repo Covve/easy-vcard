@@ -56,12 +56,12 @@ function Export(vcard: VCard, filepath: string, ext = ".vcard") {
     return;
   }
 
-  if (filepath.indexOf(".vcard") !== -1 || filepath.indexOf(".vcf"))
+  if (filepath.endsWith(".vcard") || filepath.endsWith(".vcf"))
     writeFile(filepath, vcardString, errorHandler);
   else writeFile(filepath + ext, vcardString, errorHandler);
 }
 
-function errorHandler(err) {
+function errorHandler(err: NodeJS.ErrnoException | null): void {
   if (err) throw err;
   console.log("file written successfully");
 }
