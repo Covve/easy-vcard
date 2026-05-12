@@ -242,6 +242,21 @@ describe('VCard', () => {
       const addresses = sut.toJSON().addresses ?? [];
       expect(addresses.length).toEqual(1);
     });
+
+    it('normalizes null and undefined address fields to empty strings', () => {
+      const sut = new VCard();
+      sut.addAddress('123 Main', null, undefined, null, 'USA', { type: 'home' });
+      const addresses = sut.toJSON().addresses ?? [];
+      expect(addresses.length).toEqual(1);
+      expect(addresses[0]).toEqual({
+        street: '123 Main',
+        locality: '',
+        region: '',
+        postCode: '',
+        country: 'USA',
+        params: { type: 'home' },
+      });
+    });
   });
 
   describe('isolation', () => {

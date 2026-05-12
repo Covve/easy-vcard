@@ -1,3 +1,7 @@
+## `2.1.0`
+
+- `addAddress` now accepts `null` or `undefined` for any of the five component fields, normalizing them to empty strings internally. Matches the README wording. Closes #30.
+
 ## `2.0.0`
 
 - **Breaking**: RFC6350 §3.4 value escaping is now correct. Commas (`,`) and semicolons (`;`) inside property text values are now escaped to `\,` and `\;` (previously emitted unescaped). Output for any vcard with `,` or `;` in a value will differ.
