@@ -1,18 +1,52 @@
-# Easy-vcard
+<div align="center">
 
-Create vCards and format them to strings to export as `.vcf` or `.vcard` files. Implementation of vCard 4.0 in TypeScript, per [RFC6350](https://tools.ietf.org/html/rfc6350). Many vCard properties are not yet supported — see the "Not yet supported" section at the bottom.
+# easy-vcard
 
-Supports value escaping (RFC6350 §3.4) and content-line folding at 75 octets (§3.2), and falls back to `VERSION:3.0` output on demand for older parsers.
+### vCards, done thoughtfully.
 
-## Installation
+A small TypeScript builder for [vCard 4.0](https://tools.ietf.org/html/rfc6350) strings — fluent, RFC-correct, zero runtime dependencies. From the team at [**Covve**](https://covve.com).
 
+[![npm version](https://img.shields.io/npm/v/@covve/easy-vcard.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](https://www.npmjs.com/package/@covve/easy-vcard)
+[![npm downloads](https://img.shields.io/npm/dm/@covve/easy-vcard.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](https://www.npmjs.com/package/@covve/easy-vcard)
+[![types: TypeScript](https://img.shields.io/npm/types/@covve/easy-vcard.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](https://www.typescriptlang.org/)
+[![license: MIT](https://img.shields.io/npm/l/@covve/easy-vcard.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](./LICENCE.txt)
+[![build](https://img.shields.io/circleci/build/github/Covve/easy-vcard/master.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](https://circleci.com/gh/Covve/easy-vcard)
+[![node](https://img.shields.io/node/v/@covve/easy-vcard.svg?style=flat-square&labelColor=0F0F0F&color=D9FB51)](https://nodejs.org)
+
+</div>
+
+---
+
+The vCard spec is small, but the details bite — escape rules, content-line folding, codepoint-safe UTF-8. `easy-vcard` handles them for you, so you spend your time on your product, not on [RFC 6350](https://tools.ietf.org/html/rfc6350).
+
+- **Fluent builder.** `.addEmail(…).addPhone(…).toString()` and you're done.
+- **RFC-correct out of the box.** `,` `;` `\` and newlines escape themselves. Lines fold at 75 octets. Multibyte characters (CJK, emoji, RTL) never tear.
+- **Zero runtime dependencies.** ~13 kB on npm. ES2020 output with `.d.ts`.
+- **Legacy-friendly when you need it.** Drop to `VERSION:3.0` with one flag.
+- **Battle-tested.** 88 tests across escape edge cases, multi-fold lines, i18n, and the awkward corners of the spec.
+
+---
+
+## Table of contents
+
+- [Install](#install)
+- [Quick start](#quick-start)
+- [What it handles for you](#what-it-handles-for-you)
+- [API reference](#api-reference)
+- [Not yet supported](#not-yet-supported)
+- [Releasing](#releasing)
+- [About Covve](#about-covve)
+- [License](#license)
+
+## Install
+
+```bash
+npm install @covve/easy-vcard
 ```
-npm install --save @covve/easy-vcard
-```
 
-Requires Node.js **≥18** (uses the built-in `structuredClone`).
+> Requires Node.js **≥ 18** (uses the built-in `structuredClone`).
 
-## Usage
+## Quick start
 
 ```ts
 import { VCard } from '@covve/easy-vcard';
@@ -29,173 +63,158 @@ const vcard = new VCard()
   .addTitle('Senior Engineer')
   .addOrganization('Jdoecomp co.', ['North Division']);
 
-const formattedText = vcard.toString();
-// BEGIN:VCARD
-// VERSION:4.0
-// FN:Johnny D. Doe-Smith
-// N:Doe,Smith;John;;Dr.;
-// NICKNAME:Jonny
-// TEL;PREF=1;TYPE=home:+1 1221112
-// EMAIL:jdoe@jdoecomp.co
-// TITLE:Senior Engineer
-// ORG:Jdoecomp co.;North Division
-// END:VCARD
-//
-// (each line is terminated with CRLF, and lines longer than 75 octets
-//  are folded with CRLF + SPACE)
+console.log(vcard.toString());
 ```
 
-You can also use the `Formatter` directly if you already have an `IVCard` plain object:
+```vcard
+BEGIN:VCARD
+VERSION:4.0
+FN:Johnny D. Doe-Smith
+N:Doe,Smith;John;;Dr.;
+NICKNAME:Jonny
+TEL;PREF=1;TYPE=home:+1 1221112
+EMAIL:jdoe@jdoecomp.co
+TITLE:Senior Engineer
+ORG:Jdoecomp co.;North Division
+END:VCARD
+```
+
+Each line is `CRLF`-terminated. Lines over 75 octets fold automatically with `CRLF` + space — you don't opt in.
+
+Prefer plain objects? The `Formatter` accepts an `IVCard` directly:
 
 ```ts
-import { Formatter, VCard } from '@covve/easy-vcard';
+import { Formatter } from '@covve/easy-vcard';
 
-const formatter = new Formatter();
-const text = formatter.format(vcard.toJSON());
+const text = new Formatter().format({
+  name: { fullNames: ['Johnny D. Doe-Smith'] },
+  emails: [{ value: 'jdoe@jdoecomp.co' }],
+});
 ```
 
-## Behavior worth knowing
+## What it handles for you
 
-- **Escaping (§3.4).** Backslash, comma, semicolon, and newline characters in property text values are automatically escaped to `\\`, `\,`, `\;`, and `\n` respectively. You pass raw values; the library handles escaping.
-- **Line folding (§3.2).** Content lines longer than 75 UTF-8 octets are folded with `CRLF` + space. Multibyte characters (CJK, emoji, etc.) are never split mid-codepoint.
-- **`forceV3` flag.** `vcard.toString(true)` or `formatter.format(vcard, true)` emits `VERSION:3.0`. The output still uses 4.0 conventions internally — this is a compatibility shim for parsers that reject the 4.0 version header. Use with care.
+### Escaping — RFC 6350 §3.4
 
-## VCard methods
+Pass raw strings. The library escapes `\`, `,`, `;`, and newlines in property values.
 
-_`IParams` refers to an object containing parameters used on certain vCard properties (`label`, `language`, `value`, `pref`, `altId`, `pid`, `type`, `mediatype`, `calscale`, `sortAs`, `geo`, `timezone`, `encoding`). Not every property supports every parameter — see the RFC for details._
+```ts
+new VCard()
+  .setFullName('John')
+  .addNotes('Hello, world; with a newline\nbreak')
+  .toString();
+```
 
-### `setFullName(fullName: string): VCard`
+```vcard
+NOTE:Hello\, world\; with a newline\nbreak
+```
 
-Sets the `FN` (formatted name) property. This is mandatory in a valid vCard; if no `FN` is set, one is generated from the name components on the `N` property.
+### Line folding — RFC 6350 §3.2
 
----
+Content lines longer than 75 UTF-8 octets are split with `CRLF` and a single leading space. The folder walks codepoints, not bytes — multibyte characters (`中`, `🍕`, `שלום`, `Müller`) are never split mid-character.
 
-### `addFirstName(firstName: string): VCard`
-### `addMiddleName(middleName: string): VCard`
-### `addLastName(lastName: string): VCard`
-### `addPrefixName(pre: string): VCard`
-### `addSuffixName(suf: string): VCard`
+### `VERSION:3.0` fallback
 
-Append a first name, middle name, last name, honorific prefix, or honorific suffix to the `N` property.
+Some legacy parsers reject the 4.0 header. One flag flips it:
 
----
+```ts
+vcard.toString(true);                  // emits VERSION:3.0
+new Formatter().format(json, true);    // same
+```
 
-### `addNickname(nickname: string, params?: IParams): VCard`
+The rest of the output still follows 4.0 conventions, so the result may not be fully valid 3.0. Use only when you must.
 
-Add an entry to a `NICKNAME` property.
+## API reference
 
----
+> **`IParams`** is an object of optional parameter keys: `label`, `language`, `value`, `pref`, `altId`, `pid`, `type`, `mediatype`, `calscale`, `sortAs`, `geo`, `timezone`, `encoding`. Not every property accepts every parameter — see the [RFC](https://tools.ietf.org/html/rfc6350) for the matrix.
 
-### `addPhoto(data: string, params?: IParams): VCard`
+### Name
 
-Add a `PHOTO` property. `data` may be a URL or a base64 data URI.
+| Method | What it does |
+|---|---|
+| `setFullName(fullName)` | Sets the mandatory `FN` property. If you omit it, one is built from the `N` components |
+| `addFirstName(firstName)` | Append to `N` first names |
+| `addMiddleName(middleName)` | Append to `N` middle names |
+| `addLastName(lastName)` | Append to `N` last names |
+| `addPrefixName(pre)` | Append to `N` honorific prefixes |
+| `addSuffixName(suf)` | Append to `N` honorific suffixes |
 
----
+### Contact
 
-### `addAddress(street, locality, region, postCode, country, params?: IParams): VCard`
-
-Add an `ADR` property. Each component accepts `string | null | undefined` — `null` and `undefined` are normalized to empty strings:
+| Method | What it does |
+|---|---|
+| `addNickname(nickname, params?)` | Adds a `NICKNAME` entry |
+| `addPhoto(data, params?)` | Adds a `PHOTO` entry. `data` may be a URL or a base64 data URI |
+| `addAddress(street, locality, region, postCode, country, params?)` | Adds an `ADR` entry. Each component accepts `string \| null \| undefined` — null and undefined are normalized to `""` |
+| `addPhone(number, params?)` | Adds a `TEL` entry |
+| `addEmail(email, params?)` | Adds an `EMAIL` entry |
+| `addUrl(url, params?)` | Adds a `URL` entry |
 
 ```ts
 vcard.addAddress('123 Main St.', null, undefined, 'AB-123', 'USA', { type: 'home' });
 // → ADR;TYPE=home:;;123 Main St.;;;AB-123;USA
 ```
 
----
+### Work
 
-### `addPhone(number: string, params?: IParams): VCard`
+| Method | What it does |
+|---|---|
+| `addTitle(title, params?)` | Adds a `TITLE` entry |
+| `addRole(role, params?)` | Adds a `ROLE` entry |
+| `addOrganization(organization, organizationUnits?, params?)` | Adds an `ORG` entry. `organizationUnits` lists sub-unit names beneath the primary name |
 
-Add an entry to a `TEL` property.
+### Misc
 
----
+| Method | What it does |
+|---|---|
+| `addNotes(notes, params?)` | Adds a `NOTE` entry |
+| `setRevision(rev, params?)` | Sets the `REV` property |
+| `setUID(uid, params?)` | Sets the `UID` property |
 
-### `addEmail(email: string, params?: IParams): VCard`
+### Output
 
-Add an entry to an `EMAIL` property.
-
----
-
-### `addTitle(title: string, params?: IParams): VCard`
-
-Add an entry to a `TITLE` property.
-
----
-
-### `addRole(role: string, params?: IParams): VCard`
-
-Add an entry to a `ROLE` property.
-
----
-
-### `addOrganization(organization: string, organizationUnits?: string[], params?: IParams): VCard`
-
-Add an `ORG` property. `organization` is the primary org name and `organizationUnits` contains optional sub-unit names.
-
----
-
-### `addNotes(notes: string, params?: IParams): VCard`
-
-Add an entry to a `NOTE` property.
-
----
-
-### `addUrl(url: string, params?: IParams): VCard`
-
-Add an entry to a `URL` property.
-
----
-
-### `setRevision(rev: string, params?: IParams): VCard`
-
-Set the `REV` (revision) property.
-
----
-
-### `setUID(uid: string, params?: IParams): VCard`
-
-Set the `UID` property.
-
----
-
-### `toString(forceV3 = false): string`
-### `toVcard(forceV3 = false): string`
-
-Format the vCard to a string. When `forceV3` is `true`, emits `VERSION:3.0` instead of `4.0` — useful for older parsers, but the rest of the output still follows 4.0 conventions, so the result may not be fully valid 3.0.
-
----
-
-### `toJSON(): IVCard`
-
-Returns a deep clone of the internal vCard state as a plain object, suitable for serialization or passing to `Formatter.format()`.
+| Method | Returns |
+|---|---|
+| `toString(forceV3 = false)` | Formatted vCard string |
+| `toVcard(forceV3 = false)` | Alias for `toString` |
+| `toJSON()` | Deep clone of the internal state as a plain `IVCard` object — pass it to `Formatter.format(…)` or serialize it however you like |
 
 ## Not yet supported
 
-The following vCard properties are not yet included but may be added in the future.
+The following vCard properties are not yet implemented. PRs welcome.
 
 ```
-SOURCE, KIND, XML, BDAY, ANNIVERSARY, GENDER, IMPP, LANG, TZ, GEO,
-LOGO, MEMBER, RELATED, CATEGORIES, PRODID, SOUND, CLIENTPIDMAP, KEY, FBURL, CALADRURI, CALURI
+SOURCE  KIND  XML  BDAY  ANNIVERSARY  GENDER  IMPP  LANG  TZ  GEO
+LOGO  MEMBER  RELATED  CATEGORIES  PRODID  SOUND  CLIENTPIDMAP
+KEY  FBURL  CALADRURI  CALURI
 ```
 
-Parsing existing vCard strings is out of scope for this library. For parsing, see [`vcard4`](https://www.npmjs.com/package/vcard4) or [`vcf`](https://www.npmjs.com/package/vcf).
+**Parsing existing vCard strings is out of scope** — `easy-vcard` is a one-way formatter. For parsing, reach for [`vcard4`](https://www.npmjs.com/package/vcard4) or [`vcf`](https://www.npmjs.com/package/vcf).
 
-## Contributing
+## Releasing
 
-PRs and issues welcome. See `CHANGELOG.md` for the version history.
+Publishes are automated by CircleCI.
 
-### Releasing
-
-Releases are automated. To cut a new version:
-
-1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry in a PR. Merge.
-2. Tag the merge commit with `vX.Y.Z` matching the new `package.json` version and push the tag:
-   ```
+1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry in a PR. Merge to `master`.
+2. Tag the merge commit with `vX.Y.Z` (must match `package.json`) and push:
+   ```bash
    git tag v2.3.0 && git push origin v2.3.0
    ```
-3. CircleCI's `publish` job runs on tag push: it installs, builds, lints, tests, and runs `npm publish --access public` using the `NPM_TOKEN` configured in the CircleCI project. A guard step fails the publish if the tag name doesn't match `package.json.version`.
+3. The `publish` job runs on tag push: install, build, lint, test, verify the tag matches `package.json.version`, then `npm publish --access public` using the `NPM_TOKEN` project env var.
 
-Pre-release tags (e.g. `v2.3.0-beta.1`) are not published automatically — only strict-semver tags (`vMAJOR.MINOR.PATCH`).
+Only strict-semver tags (`vMAJOR.MINOR.PATCH`) auto-publish. Pre-release tags like `v2.3.0-beta.1` do not.
+
+## About Covve
+
+[**Covve**](https://covve.com) helps professionals turn fleeting encounters into connections that matter. We build tools that cultivate networks with care — Covve's Business Card Scanner for capturing leads, a Scanning API that powers contact intake inside other products, and a CRM that follows up so you don't have to.
+
+`easy-vcard` is one of the small pieces underneath all of that — open-sourced because vCard handling is something every contact tool should get right.
+
+| | |
+|---|---|
+| Website | [covve.com](https://covve.com) |
+| Issues & PRs | [github.com/Covve/easy-vcard](https://github.com/Covve/easy-vcard) |
 
 ## License
 
-MIT
+[MIT](./LICENCE.txt) © [Covve](https://covve.com)
