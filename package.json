@@ -1,9 +1,15 @@
 {
   "name": "@covve/easy-vcard",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Simple vcard formatter",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENCE.txt"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Covve/easy-vcard.git"
@@ -19,7 +25,7 @@
     "test": "jest",
     "test:ci": "jest --ci --runInBand",
     "test:watch": "jest --watch",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "lint": "eslint src",
