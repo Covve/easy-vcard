@@ -173,15 +173,22 @@ export class VCard {
   }
 
   public addAddress(
-    street: string,
-    locality: string,
-    region: string,
-    postCode: string,
-    country: string,
+    street: string | null | undefined,
+    locality: string | null | undefined,
+    region: string | null | undefined,
+    postCode: string | null | undefined,
+    country: string | null | undefined,
     params?: IParams
   ): this {
     this._addresses = this._addresses || [];
-    this._addresses.push({ street, locality, region, postCode, country, params });
+    this._addresses.push({
+      street: street ?? "",
+      locality: locality ?? "",
+      region: region ?? "",
+      postCode: postCode ?? "",
+      country: country ?? "",
+      params,
+    });
     return this;
   }
 
