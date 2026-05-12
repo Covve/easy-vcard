@@ -4,13 +4,12 @@ defaults: &defaults
   docker:
     - image: cimg/node:22.14
 
-version: 2
+version: 2.1
+
 jobs:
   build:
     <<: *defaults
     steps:
-      - attach_workspace:
-          at: ~/easy-vcard
       - checkout
       - run:
           name: install node modules
@@ -18,8 +17,48 @@ jobs:
       - run:
           name: test easy-vcard
           command: npm run test:ci
-      - store_test_results:
-          path: ~/xapp/test_results
+      - run:
+          name: lint easy-vcard
+          command: npm run lint
       - run:
           name: build easy-vcard
           command: npm run build
+
+  publish:
+    <<: *defaults
+    steps:
+      - checkout
+      - run:
+          name: verify tag matches package.json version
+          command: |
+            PKG_VERSION="v$(node -p "require('./package.json').version")"
+            if [ "$CIRCLE_TAG" != "$PKG_VERSION" ]; then
+              echo "Tag $CIRCLE_TAG does not match package.json version $PKG_VERSION"
+              exit 1
+            fi
+      - run:
+          name: install (runs prepare -> tsc build via npm lifecycle)
+          command: npm install --unsafe-perm=true --no-save
+      - run:
+          name: authenticate with npm
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run:
+          name: publish to npm (runs prepublishOnly -> test + lint via npm lifecycle)
+          command: npm publish --access public
+
+workflows:
+  version: 2
+  build_and_publish:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*/
+      - publish:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
