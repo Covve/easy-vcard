@@ -183,6 +183,19 @@ Parsing existing vCard strings is out of scope for this library. For parsing, se
 
 PRs and issues welcome. See `CHANGELOG.md` for the version history.
 
+### Releasing
+
+Releases are automated. To cut a new version:
+
+1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry in a PR. Merge.
+2. Tag the merge commit with `vX.Y.Z` matching the new `package.json` version and push the tag:
+   ```
+   git tag v2.3.0 && git push origin v2.3.0
+   ```
+3. CircleCI's `publish` job runs on tag push: it installs, builds, lints, tests, and runs `npm publish --access public` using the `NPM_TOKEN` configured in the CircleCI project. A guard step fails the publish if the tag name doesn't match `package.json.version`.
+
+Pre-release tags (e.g. `v2.3.0-beta.1`) are not published automatically — only strict-semver tags (`vMAJOR.MINOR.PATCH`).
+
 ## License
 
 MIT
